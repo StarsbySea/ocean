@@ -1,7 +1,7 @@
 #.github\workflows\schedule.yml
 on:
   schedule:
-  - cron: '* * * * *'
+  - cron: '*/2 * * * *'
 name: Excavator
 jobs:
   excavate:
