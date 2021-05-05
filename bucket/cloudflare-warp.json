@@ -1,0 +1,36 @@
+{
+    "version": "1.4.107.0",
+    "description": "The WARP application uses BoringTun to encrypt all the traffic from your device and send it directly to Cloudflare’s edge, ensuring that no one in between is snooping on what you're doing.",
+    "homepage": "https://cloudflarewarp.com/",
+    "license": {
+        "identifier": "Freeware",
+        "url": "https://www.cloudflare.com/zh-cn/application/terms/"
+    },
+    "url": "https://ocean-api.deno.dev/cloudflare-warp?dl#/setup.msi_",
+    "hash": "24854d4d0b1327af371cc2bbd4496b2b58f17bd5cea2554c41b36d58d5ece3b4",
+    "pre_install": "if (-not (is_admin)) { error 'This package requires admin privileges to install.'; break }",
+    "installer": {
+        "script": [
+            "Invoke-ExternalCommand msiexec -ArgumentList @('/i', \"$dir\\$fname\", '/quiet', '/norestart') -RunAs | Out-Null",
+            "while ($warp_process -eq $null) {",
+            "    Start-Sleep -Milliseconds 250",
+            "    $warp_process = Get-Process | Where-Object { $_.name -eq 'cloudflare warp' }",
+            "}",
+            "$warp_process | ForEach-Object { Stop-Process -Id $_.Id -Force }"
+        ]
+    },
+    "post_install": "Remove-Item \"$dir\\setup.msi_\"",
+    "uninstaller": {
+        "script": [
+            "if (-not (is_admin)) { error 'This package requires admin privileges to uninstall.'; break }",
+            "cmd /c (((Get-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object {$_.DisplayName -eq \"Cloudflare WARP\"} | Select-Object -Expand UninstallString))+ \" /quiet /norestart\")"
+        ]
+    },
+    "checkver": {
+        "url": "https://ocean-api.deno.dev/cloudflare-warp",
+        "jsonpath": "$.version"
+    },
+    "autoupdate": {
+        "url": "https://ocean-api.deno.dev/cloudflare-warp?dl#/setup.msi_"
+    }
+}
