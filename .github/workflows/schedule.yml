@@ -1,8 +1,8 @@
 #.github\workflows\schedule.yml
 on:
-  workflow_dispatch:
   schedule:
-  - cron: '*/30 * * * *'
+  - cron: '0 * * * *'
+  workflow_dispatch:
 name: Excavator
 jobs:
   excavate:
@@ -15,4 +15,5 @@ jobs:
       env:
         GITH_EMAIL: ${{ secrets.EMAIL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SHOVEL: '1'
         SKIP_UPDATED: '1'
