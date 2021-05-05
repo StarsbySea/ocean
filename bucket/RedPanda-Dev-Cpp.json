@@ -2,7 +2,7 @@
     "homepage": "https://github.com/royqh1979/Dev-Cpp",
     "description": "Red Panda Dev C++ is a improved fork of Orwell Dev-C++.",
     "license": "GPL-3.0",
-    "version": "6.6",
+    "version": "0.0",
     "url": "https://sourceforge.net/projects/dev-cpp-2020/files/v6.6/Dev-Cpp.6.6.GCC.10.2.Portable.7z",
     "hash": "sha1:c99c6edbd0fcd439084d9296e77c8bd88ac2fe1b",
     "extract_dir": "Dev-Cpp",
