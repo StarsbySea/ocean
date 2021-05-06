@@ -1,0 +1,29 @@
+{
+    "version": "8.0.0",
+    "description": "Cisco Packet Tracer is a network simulator software.",
+    "homepage": "https://www.netacad.com/courses/packet-tracer",
+    "license": {
+        "identifier": "Freeware",
+        "url": "https://www.cisco.com/c/en/us/about/legal/cloud-and-software/end_user_license_agreement.html"
+    },
+    "url": "https://archive.org/download/packet-tracer-800-build-212-mac-notarized/PacketTracer800_Build212_64bit_setup-signed.exe",
+    "hash": "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
+    "innosetup": true,
+    "shortcuts": [
+        [
+            "bin\\PacketTracer.exe",
+            "Packet Tracer"
+        ]
+    ],
+    "checkver": {
+        "url": "https://www.computernetworkingnotes.com/ccna-study-guide/download-packet-tracer-for-windows-and-linux.html",
+        "regex": "href=\"(?<link>.+?)\".+Tracer (?<version>\\d+.\\d+.\\d+)"
+    },
+    "autoupdate": {
+        "url": "$matchLink"
+    },
+    "notes": [
+        "The login requirement can be bypassed with a patch at:",
+        "https://github.com/StarsbySea/ocean/raw/master/tweak/packet-tracer_loginbypass_patch_x64.exe"
+    ]
+}
