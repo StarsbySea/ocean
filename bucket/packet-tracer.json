@@ -6,9 +6,18 @@
         "identifier": "Freeware",
         "url": "https://www.cisco.com/c/en/us/about/legal/cloud-and-software/end_user_license_agreement.html"
     },
-    "url": "https://archive.org/download/packet-tracer-800-build-212-mac-notarized/PacketTracer800_Build212_64bit_setup-signed.exe",
-    "hash": "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
-    "innosetup": true,
+    "url": [
+        "https://archive.org/download/packet-tracer-800-build-212-mac-notarized/PacketTracer800_Build212_64bit_setup-signed.exe#/dl.exe",
+        "https://github.com/StarsbySea/ocean/raw/master/tweak/packet-tracer/chinese_chi.ptl#/chinese_chi.ptl"
+    ],
+    "hash": [
+        "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
+        "50A7E523EF6D3098C8A322E183A51FD7F9A7ABC8ED1D68A518FF7729D70C326A"
+    ],
+    "installer": {
+        "script": "Expand-InnoArchive \"$dir\\dl.exe\" -Destination \"$dir\" -Removal"
+    },
+    "post_install": "Move-Item \"$dir\\chinese_chi.ptl\" \"$dir\\languages\\chinese_chi.ptl\"",
     "shortcuts": [
         [
             "bin\\PacketTracer.exe",
@@ -20,7 +29,7 @@
         "regex": "href=\"(?<link>.+?)\".+Tracer (?<version>\\d+.\\d+.\\d+)"
     },
     "autoupdate": {
-        "url": "$matchLink"
+        "url": "$matchLink#/dl.exe"
     },
     "notes": [
         "The login requirement can be bypassed with a patch at:",
