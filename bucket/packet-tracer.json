@@ -13,7 +13,6 @@
     "hash": [
         "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
         "2c246c7c81481cf722ced9a9843799051edce5c7869049811c182e9756df24ae"
-        
     ],
     "installer": {
         "script": "Expand-InnoArchive \"$dir\\dl.exe\" -Destination \"$dir\" -Removal"
