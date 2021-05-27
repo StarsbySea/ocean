@@ -1,0 +1,27 @@
+{
+    "version": "4.4.3",
+    "description": "Geph is a modular Internet censorship circumvention system designed specifically to deal with national filtering. ",
+    "homepage": "https://geph.io/",
+    "license": "GPL-3.0",
+    "url": "https://f001.backblazeb2.com/file/geph4-dl/Geph4Releases/4.4.3/geph-windows-4.4.3-setup.exe",
+    "hash": "2df8bc84d89f38897613f5000fb32b1d8d1b5a4113ae40e09bc56d3aa73c13a1",
+    "innosetup": true,
+    "installer": {
+        "script": [
+            "Move-Item \"$dir\\*\" \"$dir\\geph-cli\"",
+            "Move-Item \"$dir\\geph-cli\\resources\\app\\binaries\\win-ia32\\*\" \"$dir\"",
+            "Remove-Item \"$dir\\geph-cli\" -Recurse"
+        ]
+    },
+    "bin": [
+        "geph4-client.exe",
+        "geph4-client64.exe",
+        "geph4-vpn-helper.exe"
+    ],
+    "checkver": {
+        "github": "https://github.com/geph-official/geph4"
+    },
+    "autoupdate": {
+        "url": "https://f001.backblazeb2.com/file/geph4-dl/Geph4Releases/$version/geph-windows-$version-setup.exe"
+    }
+}
