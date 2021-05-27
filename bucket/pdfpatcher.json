@@ -1,0 +1,20 @@
+{
+    "version": "0.6.2.3647",
+    "description": "PDFPatcher is a tool for modifying information in PDF files. (Chinese language only)",
+    "homepage": "https://www.cnblogs.com/pdfpatcher/",
+    "license": "Freeware",
+    "url": "https://github.com/StarsbySea/ocean/raw/master/archives/PDFPatcher.0.6.2.3647.7z",
+    "hash": "BA7D09C38F48D230C8B53DCBE9D1949EFBC4E35E44AB25EF3EDE10A93CBB892C",
+    "shortcuts": [
+        [
+            "PDFPatcher.exe",
+            "PDFPatcher"
+        ]
+    ],
+    "checkver": {
+        "url": "https://www.cnblogs.com/pdfpatcher/",
+        "regex": "版（(?<version>\\d+\\.\\d+\\.\\d+\\.\\d+)）"
+    }
+    
+
+}
