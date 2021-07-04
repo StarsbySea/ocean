@@ -18,6 +18,6 @@
         "regex": "Dev-Cpp\\.(\\d+\\.+\\d(\\.+\\d|))"
     },
     "autoupdate": {
-        "url": "https://sourceforge.net/projects/dev-cpp-2020/files/v$version/Dev-Cpp.$version.GCC.10.2.Portable.7z"
+        "url": "https://sourceforge.net/projects/dev-cpp-2020/files/v$version/Dev-Cpp.$version.GCC.10.3.Portable.7z"
     }
 }
