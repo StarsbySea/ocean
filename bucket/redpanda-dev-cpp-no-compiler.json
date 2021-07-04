@@ -15,7 +15,7 @@
     ],
     "checkver": {
         "url": "https://royqh.net/download/",
-        "regex": "Dev-Cpp\\.(\\d+\\.+\\d)"
+        "regex": "Dev-Cpp\\.(\\d+\\.+\\d(\\.+\\d|))"
     },
     "autoupdate": {
         "url": "https://sourceforge.net/projects/dev-cpp-2020/files/v$version/Dev-Cpp.$version.No.Compiler.Portable.7z"
