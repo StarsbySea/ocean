@@ -1,13 +1,13 @@
 {
-    "version": "19043.1149",
+    "version": "19043.1151",
     "description": "Get the latest Win10 images.(Chinese language pack only.)",
     "homepage": "https://latest10.win/",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx"
     },
-    "url": "https://sharepoint.latest10.win/19043.1149/19043.1149.210717-0905.21H1_RELEASE_SVC_PROD3_CLIENTMULTI_X64FRE_ZH-CN.ISO#/setup.iso_",
-    "hash": "sha1:f5eda904540f152912eb0527d36f3c12aeac0436",
+    "url": "https://sharepoint.latest10.win/19043.1151/19043.1151.210724-1008.21H1_RELEASE_SVC_PROD3_CLIENTMULTI_X64FRE_ZH-CN.ISO#/setup.iso_",
+    "hash": "sha1:a58d91b429270d1087d9d1e25af3230888981b78",
     "installer": {
         "script": "Rename-Item \"$dir\\setup.iso_\" \"$dir\\WIN10_X64_ZH_CN.ISO\""
     },
