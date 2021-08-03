@@ -19,7 +19,8 @@
         "geph4-vpn-helper.exe"
     ],
     "checkver": {
-        "github": "https://github.com/geph-official/geph4"
+        "url": "https://github.com/geph-official/geph4/releases",
+        "regex": "v(\\d+\\.\\d+\\.\\d)"
     },
     "autoupdate": {
         "url": "https://f001.backblazeb2.com/file/geph4-dl/Geph4Releases/$version/geph-windows-$version-setup.exe"
