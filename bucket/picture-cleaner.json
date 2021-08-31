@@ -1,0 +1,24 @@
+{
+    "version": "",
+    "description": "Free professional tools for image correction and bleaching, professional removal of black background pockmarks and stray colours from document images, normalised A4 and B5 size output, giving you a clear text.",
+    "homepage": "https://www.cnblogs.com/Charltsing/p/PictureCleaner.html",
+    "license": "Freeware",
+    "url": "https://github.com/StarsbySea/PictureCleaner/releases/download/v1.1.5.0607/PictureCleaner-v1.1.5.0607.rar",
+    "hash": "f9256a3026a87a9a9b8f5a905319580371550c5fb24994cc0dad5dab113c63ab",
+    "pre_install": [
+        "Move-Item -Path \"$dir\\PictureCleaner\\*\" -Destination \"$dir\\\" -Force",
+        "Remove-Item \"$dir\\PictureCleaner\""
+    ],
+    "shortcuts": [
+        [
+            "PictureCleaner.exe",
+            "PictureCleaner"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/StarsbySea/PictureCleaner/"
+    },
+    "autoupdate": {
+        "url": "https://github.com/StarsbySea/PictureCleaner/releases/download/v$version/PictureCleaner-v$version.rar"
+    }
+}
