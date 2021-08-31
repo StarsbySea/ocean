@@ -13,10 +13,10 @@
     },
     "checkver": {
         "url": "https://latest10.win/get",
-        "regex": "\\.win/(?<version>[\\d\\.]+)/\\d+\\.\\d+\\.(?<filenameinfo>.+?)\\.ISO"
+        "regex": "\\.win/(?<version>[\\d.]+).(?<filenameinfo>.+?)\\.ISO"
     },
     "autoupdate": {
-        "url": "https://sharepoint.latest10.win/$version/$version.$matchFilenameinfo.ISO#/setup.iso_",
+        "url": "https://sharepoint.latest10.win/$version/$matchFilenameinfo.ISO#/setup.iso_",
         "hash": {
             "url": "https://latest10.win/get",
             "regex": "SHA1：$sha1"
