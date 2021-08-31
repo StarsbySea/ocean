@@ -4,7 +4,7 @@
     "homepage": "https://www.cnblogs.com/Charltsing/p/PictureCleaner.html",
     "license": "Freeware",
     "url": "https://github.com/StarsbySea/PictureCleaner/releases/download/v1.1.5.0607/PictureCleaner-v1.1.5.0607.rar",
-    "hash": "f9256a3026a87a9a9b8f5a905319580371550c5fb24994cc0dad5dab113c63ab",
+    "hash": "F9256A3026A87A9A9B8F5A905319580371550C5FB24994CC0DAD5DAB113C63AB",
     "pre_install": [
         "Move-Item -Path \"$dir\\PictureCleaner\\*\" -Destination \"$dir\\\" -Force",
         "Remove-Item \"$dir\\PictureCleaner\""
