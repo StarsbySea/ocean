@@ -36,7 +36,7 @@
 
     ],
     "checkver": {
-        "url": "http://www.holtek.com/ice",
+        "url": "https://www.holtek.com/ice",
         "regex": "href=\"\/(?<pathname>documents\/\\d+\/\\d+\/HT-IDE3KV.+?)\">.+?HT-IDE3000 V(?<version>\\d+.\\d+)"
     },
     "autoupdate": {
