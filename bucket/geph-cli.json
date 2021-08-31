@@ -19,7 +19,7 @@
         "geph4-vpn-helper.exe"
     ],
     "checkver": {
-        "url": "https://github.com/geph-official/geph4/releases",
+        "url": "https://api.github.com/repos/geph-official/geph4/tags",
         "regex": "(?:v|V)?([\\d.]+)"
     },
     "autoupdate": {
