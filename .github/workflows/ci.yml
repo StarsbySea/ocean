@@ -15,7 +15,7 @@ env:
   SCOOP_HELPERS: C:\projects\helpers
 
 jobs:
-  test:
+  CI:
     runs-on: windows-latest
     steps:
     - name: Check out repository code
