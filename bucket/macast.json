@@ -1,10 +1,10 @@
 {
-    "version": "0.61",
+    "version": "0.64",
     "description": "Macast is a cross-platform application which using mpv as DLNA Media Renderer.",
     "homepage": "https://xfangfang.github.io/Macast/",
     "license": "GPL-3.0",
-    "url": "https://github.com/xfangfang/Macast/releases/download/v0.61/Macast-Windows-v0.61.exe#/Macast-Windows.exe",
-    "hash": "56806c0a3e7a0770600e8837840950a54632daf70d284a6233246077c0b3e680",
+    "url": "https://github.com/xfangfang/Macast/releases/download/v0.64/Macast-Windows-v0.64.exe#/Macast-Windows.exe",
+    "hash": "4c8ea297e4735772516071df09246bf8b49d2926c1f84b26004932f83821d0a3",
     "shortcuts": [
         [
             "Macast-Windows.exe",
