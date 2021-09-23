@@ -1,10 +1,10 @@
 {
-    "version": "1.5.0",
+    "version": "1.5.1",
     "description": "Test Cloudflare CDN latency and speed, get the fastest IP (IPv4+IPv6)!",
     "homepage": "https://github.com/XIU2/CloudflareSpeedTest",
     "license": "GPL-3.0",
-    "url": "https://github.com/XIU2/CloudflareSpeedTest/releases/download/v1.5.0/CloudflareST_windows_amd64.zip",
-    "hash": "e08ae91075ece23046d4bd8032e63a74246a79f0d570e59096a7ae7b49d63a30",
+    "url": "https://github.com/XIU2/CloudflareSpeedTest/releases/download/v1.5.1/CloudflareST_windows_amd64.zip",
+    "hash": "9704e37231c660cfb3e0753f271ce67c05dd487ba9efc18979962d19bc7e7c5a",
     "shortcuts": [
         [
             "CloudflareST.exe",
