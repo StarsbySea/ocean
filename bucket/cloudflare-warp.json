@@ -22,8 +22,7 @@
     "post_install": "Remove-Item \"$dir\\setup.msi_\"",
     "uninstaller": {
         "script": [
-            "if (-not (is_admin)) { error 'This package requires admin privileges to uninstall.'; break }",
-            "cmd /c (((Get-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object {$_.DisplayName -eq \"Cloudflare WARP\"} | Select-Object -Expand UninstallString))+ \" /quiet /norestart\")"
+            "cmd /c (((Get-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object {$_.DisplayName -eq \"Cloudflare WARP\"} | Select-Object -Expand UninstallString))+ \" /norestart\")"
         ]
     },
     "checkver": {
