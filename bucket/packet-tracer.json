@@ -28,9 +28,6 @@
         "url": "https://www.computernetworkingnotes.com/ccna-study-guide/download-packet-tracer-for-windows-and-linux.html",
         "regex": "href=\"(?<link>.+?)\".+Tracer (?<version>\\d+.\\d+.\\d+)"
     },
-    "autoupdate": {
-        "url": "$matchLink#/dl.exe"
-    },
     "notes": [
         "The login requirement can be bypassed with a patch at:",
         "https://github.com/StarsbySea/ocean/raw/files/binaries/packet-tracer_loginbypass_patch_x64.7z"
