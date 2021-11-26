@@ -1,0 +1,23 @@
+{
+    "homepage": "https://github.com/royqh1979/RedPanda-CPP",
+    "description": " A light-weight C/C++ IDE based on Qt",
+    "license": "GPL-3.0",
+    "version": "0.9.0",
+    "url": "https://sourceforge.net/projects/dev-cpp-2020/files/0.9.0/RedPanda-Cpp.7.beta.0.9.0.MinGW-w64.X86_64.GCC.11.2.Portable.7z",
+    "hash": "sha1:8d4d45e7440bcd6999be21170cf658e4045e7abc",
+    "extract_dir": "RedPanda-Cpp",
+    "persist": "config",
+    "shortcuts": [
+        [
+            "RedPandaIDE.exe",
+            "RedPanda C++"
+        ]
+    ],
+    "checkver": {
+        "url": "https://sourceforge.net/projects/dev-cpp-2020/rss?path=/",
+        "regex": "RedPanda-Cpp.7.beta.(?<version>[\\d.]+).MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
+    },
+    "autoupdate": {
+        "url": "https://sourceforge.net/projects/dev-cpp-2020/files/$version/RedPanda-Cpp.7.beta.$version.MinGW-w64.X86_64.GCC.$matchGccversion.Portable.7z"
+    }
+}
