@@ -5,10 +5,7 @@
     "license": "Freeware",
     "url": "http://download.theworld.cn/twc/TheWorld5.0.0.2.zip",
     "hash": "ec238425c211e905884ba31831201b6512d91acfe46442b33ebb4b1d8a45e47d",
-    "pre_install": [
-        "Move-Item -Path \"$dir\\TheWorld5.0.0.2\\*\" -Destination \"$dir\\\" -Force",
-        "Remove-Item \"$dir\\TheWorld5.0.0.2\""
-    ],
+    "extract_dir": "TheWorld5.0.0.2",
     "shortcuts": [
         [
             "TheWorld.exe",
