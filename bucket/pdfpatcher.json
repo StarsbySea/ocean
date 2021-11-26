@@ -13,6 +13,6 @@
     ],
     "checkver": {
         "url": "https://www.cnblogs.com/pdfpatcher/",
-        "regex": "版（(?<version>\\d+\\.\\d+\\.\\d+\\.\\d+)）"
+        "regex": " (?<version>[\d.]+) "
     }
 }
