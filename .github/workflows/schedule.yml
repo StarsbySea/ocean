@@ -14,3 +14,4 @@ jobs:
         GITH_EMAIL: ${{ secrets.EMAIL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SKIP_UPDATED: '1'
+        
