@@ -16,8 +16,7 @@
         ]
     ],
     "checkver": {
-        "url": "https://www.cnblogs.com/Charltsing/p/PictureCleaner.html",
-        "regex": "v(?<version>[\\d.]+)"
+        "github": "https://github.com/StarsbySea/PictureCleaner"
     },
     "autoupdate": {
         "url": "https://github.com/StarsbySea/PictureCleaner/releases/download/v$version/PictureCleaner-v$version.rar"
