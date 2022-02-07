@@ -8,16 +8,23 @@
     },
     "url": [
         "https://archive.org/download/packet-tracer-800-build-212-mac-notarized/PacketTracer800_Build212_64bit_setup-signed.exe#/dl.exe",
-        "https://github.com/StarsbySea/ocean/raw/files/attachments/packet-tracer_language-pack_chinese.7z#/zh-lang.7z"
+        "https://github.com/StarsbySea/ocean-files/releases/download/v8.0.0/packet-tracer_language-pack_chinese.7z",
+        "https://github.com/StarsbySea/ocean-files/releases/download/v8.0.0/PacketTracer.patched.exe#/PacketTracer.exe"
     ],
     "hash": [
         "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
-        "2c246c7c81481cf722ced9a9843799051edce5c7869049811c182e9756df24ae"
+        "324f934848adf195272eb33bc6ba2454bc352a1e668d4b8df47595b719623251",
+        "f234d6d426815b387326b3dab0647c804ea1eda5401dca4985b693e059c3c767"
+
     ],
     "installer": {
         "script": "Expand-InnoArchive \"$dir\\dl.exe\" -Destination \"$dir\" -Removal"
     },
-    "post_install": "Move-Item \"$dir\\chinese_chi.ptl\" \"$dir\\languages\"",
+    "post_install": [
+        "Move-Item \"$dir\\chinese_chi.ptl\" \"$dir\\languages\"",
+        "Rename-Item \"$dir\\bin\\PacketTracer.exe\" \"$dir\\bin\\PacketTracer.Original.exe.bak\"",
+        "Move-Item \"$dir\\PacketTracer.exe\" \"$dir\\bin\" -Force"
+    ],
     "shortcuts": [
         [
             "bin\\PacketTracer.exe",
@@ -29,7 +36,6 @@
         "regex": "href=\"(?<link>.+?)\".+Tracer (?<version>\\d+.\\d+.\\d+)"
     },
     "notes": [
-        "The login requirement can be bypassed with a patch at:",
-        "https://github.com/StarsbySea/ocean/raw/files/binaries/packet-tracer_loginbypass_patch_x64.7z"
+        "The requirement to log in has been bypassed."
     ]
 }
