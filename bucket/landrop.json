@@ -2,7 +2,10 @@
     "version": "0.4.0",
     "description": "LANDrop is a cross-platform tool that you can use to conveniently transfer photos, videos, and other types of files to other devices on the same local network.",
     "homepage": "https://landrop.app",
-    "license": "BSD-3-Clause",
+    "license": {
+        "identifier": "BSD-3-Clause",
+        "url": "https://github.com/LANDrop/LANDrop/blob/master/LICENSE"
+    },
     "url": "https://github.com/LANDrop/LANDrop/releases/download/v0.4.0/LANDrop-0.4.0-win.zip",
     "hash": "cd4b27d77212731f70cf24d7fbcfd89cb44df060fa66efe7bd3464675afd4be4",
     "pre_install": [
