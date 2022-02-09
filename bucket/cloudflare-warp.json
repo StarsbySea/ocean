@@ -1,6 +1,6 @@
 {
     "version": "2021.12.2.0",
-    "description": "The WARP application uses BoringTun to encrypt all the traffic from your device and send it directly to Cloudflare’s edge, ensuring that no one in between is snooping on what you're doing.",
+    "description": "The WARP application uses BoringTun to encrypt all the traffic from your device and send it directly to Cloudflare's edge, ensuring that no one in between is snooping on what you're doing.",
     "homepage": "https://cloudflarewarp.com/",
     "license": {
         "identifier": "Freeware",
