@@ -2,7 +2,10 @@
     "version": "1.0",
     "description": "SpleeterMsvcExe is a Windows command line program for Spleeter, which can be used directly.",
     "homepage": "https://github.com/wudicgi/SpleeterMsvcExe",
-    "license": "MIT",
+    "license": {
+        "identifier": "MIT",
+        "url": "https://github.com/wudicgi/SpleeterMsvcExe/blob/master/LICENSE"
+    },
     "url": [
         "https://github.com/wudicgi/SpleeterMsvcExe/releases/download/v1.0/SpleeterMsvcExe-v1.0.zip",
         "https://github.com/wudicgi/SpleeterMsvcExe/releases/download/models-v1.0/models-all.zip#/dl.zip_"
