@@ -2,7 +2,10 @@
     "version": "0.5.7",
     "description": " TCPioneer is a program for Windows that protects the TCP connections from being interfered.",
     "homepage": "https://github.com/Macronut/TCPioneer/",
-    "license": "LGPL-3.0",
+    "license": {
+        "identifier": "LGPL-3.0",
+        "url": "https://github.com/Macronut/TCPioneer/blob/master/LICENSE"
+    },
     "url": "https://github.com/Macronut/TCPioneer/releases/download/v0.5.7/tcpioneer.zip",
     "hash": "279502dae27eea080ed05ab0eb87ffd673cc176dd1cca8a279927b633bd8eb51",
     "bin": "tcpioneer.exe",
