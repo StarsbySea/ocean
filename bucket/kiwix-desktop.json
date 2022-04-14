@@ -18,8 +18,8 @@
         ]
     ],
     "checkver": {
-        "url": "https://download.kiwix.org/release/kiwix-desktop/feed.xml",
-        "regex": "kiwix-desktop_windows_x64_([\\d.]+)\\.zip"
+        "url": "https://download.kiwix.org/release/kiwix-desktop/?C=M;O=D",
+        "regex": "kiwix-desktop_windows_x64_([\\d.-]+?).zip"
     },
     "autoupdate": {
         "url": "https://master.dl.sourceforge.net/project/kiwix/kiwix-desktop/kiwix-desktop_windows_x64_$version.zip"
