@@ -22,6 +22,6 @@
         "regex": "kiwix-desktop_windows_x64_([\\d.-]+?).zip"
     },
     "autoupdate": {
-        "url": "https://master.dl.sourceforge.net/project/kiwix/kiwix-desktop/kiwix-desktop_windows_x64_$version.zip"
+        "url": "https://download.kiwix.org/release/kiwix-desktop/kiwix-desktop_windows_x64_$version.zip"
     }
 }
