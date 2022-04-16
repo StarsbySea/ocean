@@ -15,12 +15,5 @@
             "devcpp.exe",
             "RedPanda Dev-C++"
         ]
-    ],
-    "checkver": {
-        "url": "https://royqh.net/download/",
-        "regex": "Dev-Cpp.(?<version>[\\d.]+).MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
-    },
-    "autoupdate": {
-        "url": "https://sourceforge.net/projects/dev-cpp-2020/files/v$version/Dev-Cpp.$version.MinGW-w64.X86_64.GCC.$matchGccversion.Portable.7z"
-    }
+    ]
 }
