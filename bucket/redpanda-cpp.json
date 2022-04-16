@@ -5,7 +5,7 @@
         "identifier": "GPL-3.0",
         "url": "https://github.com/royqh1979/RedPanda-CPP/blob/master/LICENSE"
     },
-    "version": "0.0.0",
+    "version": "1.0.0",
     "architecture": {
         "64bit": {
             "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.0.0/RedPanda.C%2B%2B.1.0.0.win64.MinGW-w64.X86_64.GCC.10.3.Portable.7z",
