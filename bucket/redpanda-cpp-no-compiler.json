@@ -5,15 +5,15 @@
         "identifier": "GPL-3.0",
         "url": "https://github.com/royqh1979/RedPanda-CPP/blob/master/LICENSE"
     },
-    "version": "1.0.6",
+    "version": "1.1.0",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.0.6/RedPanda.C%2B%2B.1.0.6.win64.No.Compiler.Portable.7z",
-            "hash": "sha1:81111a60a05a5628d13d2d552d13a7a680e8baa7"
+            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.1.0/RedPanda.C%2B%2B.1.1.0.win64.No.Compiler.Portable.7z",
+            "hash": "sha1:4193bf986d39aa8de4c4bb2eacdd0a900a2073df"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.0.6/RedPanda.C%2B%2B.1.0.6.win32.No.Compiler.Portable.7z",
-            "hash": "sha1:59fade002660b6ec061790b911ddcf6b9b96b1e2"
+            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.1.0/RedPanda.C%2B%2B.1.1.0.win32.No.Compiler.Portable.7z",
+            "hash": "sha1:c0081939569c6dc2c2aa628197aa74a4897833dc"
         }
     },
     "extract_dir": "RedPanda-Cpp",
