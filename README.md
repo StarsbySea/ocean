@@ -1,4 +1,4 @@
-# Scoop ocean Bucket 
+# Scoop ocean Bucket
 [![GitHub stars](https://img.shields.io/github/stars/StarsbySea/ocean)](https://github.com/StarsbySea/ocean/stargazers) [![Tests](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml) [![Excavator](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml)
 
 A bucket designed to collect niche but useful software.
