@@ -30,3 +30,6 @@ A bucket designed to collect niche but useful software.
 | RedPanda Cpp         | A light-weight C/C++ IDE based on Qt.                                                                             | `scoop install ocean/redpanda-cpp` <br> `scoop install ocean/redpanda-cpp-no-compiler`         |
 | RedPanda DevC++    | Red Panda Dev C++ is a improved fork of Orwell Dev-C++.                                                           | `scoop install ocean/redpanda-dev-cpp` <br> `scoop install ocean/redpanda-dev-cpp-no-compiler` |
 | The World Browser    | The World Browser is a multi-tabbed browser (IE kernel) from Phoenix Studios.                                     | `scoop install ocean/theworldv3` <br> `scoop install ocean/theworldv5`                         |
+
+## Requesting a new app
+Feel free to open a new [pull request](https://github.com/StarsbySea/ocean/compare) or [issue](https://github.com/StarsbySea/ocean/issues/new/choose) and let's grow the scoop ecosystem together.
