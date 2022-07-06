@@ -1,4 +1,5 @@
 on:
+  workflow_dispatch:
   schedule:
   - cron: '0 * * * *'
 name: Excavator
@@ -9,8 +10,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Excavate
-      uses: shovel-org/GithubActions@main
+      uses: ScoopInstaller/GithubActions@main
       env:
-        GITH_EMAIL: ${{ secrets.EMAIL }}
+        USER_EMAIL: ${{ secrets.EMAIL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SKIP_UPDATED: '1'
