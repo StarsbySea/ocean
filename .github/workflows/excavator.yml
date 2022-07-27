@@ -12,6 +12,5 @@ jobs:
     - name: Excavate
       uses: ScoopInstaller/GithubActions@main
       env:
-        USER_EMAIL: ${{ secrets.EMAIL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SKIP_UPDATED: '1'
