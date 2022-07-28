@@ -26,7 +26,7 @@
     ],
     "checkver": {
         "url": "https://sourceforge.net/projects/redpanda-cpp/rss?path=/",
-        "regex": "RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
+        "regex": "RedPanda.C%2B%2B.(?<x86version>[\\d.]+).win32.MinGW-w64.i686.GCC.(?<x86gccversion>[\\d.]+).Portable.7z[\\s\\S]*?RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
     },
     "autoupdate": {
         "architecture": {
@@ -34,7 +34,7 @@
                 "url": "https://sourceforge.net/projects/redpanda-cpp/files/$version/RedPanda.C%2B%2B.$version.win64.MinGW-w64.X86_64.GCC.$matchGccversion.Portable.7z"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/$version/RedPanda.C%2B%2B.$version.win32.MinGW-w64.i686.GCC.$matchGccversion.Portable.7z"
+                "url": "https://sourceforge.net/projects/redpanda-cpp/files/$matchX86version/RedPanda.C%2B%2B.$matchX86version.win32.MinGW-w64.i686.GCC.$matchX86gccversion.Portable.7z"
             }
         }
     }
