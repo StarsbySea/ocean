@@ -17,7 +17,7 @@
     },
     "post_install": [
         "Remove-Item C:\\Users\\*\\Desktop\\iSlide.lnk -Force",
-        "Remove-Item -Recurse \"$([Environment]::GetFolderPath('startmenu'))\\Programs\\iSlide Tools\"",
+        "Remove-Item -Recurse \"$([Environment]::GetFolderPath('StartMenu'))\\Programs\\iSlide Tools\"",
         "Remove-Item HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\iSlide Tools -Recurse"
     ],
     "uninstaller": {
