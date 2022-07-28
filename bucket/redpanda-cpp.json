@@ -5,15 +5,15 @@
         "identifier": "GPL-3.0",
         "url": "https://github.com/royqh1979/RedPanda-CPP/blob/master/LICENSE"
     },
-    "version": "1.0.0",
+    "version": "1.1.5",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.0.0/RedPanda.C%2B%2B.1.0.0.win64.MinGW-w64.X86_64.GCC.10.3.Portable.7z",
-            "hash": "sha1:65e21653763aa148d2221ae27749feb59d118b24"
+            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.1.5/RedPanda.C%2B%2B.1.1.5.win64.MinGW-w64.X86_64.GCC.11.2.Portable.7z",
+            "hash": "sha1:983e25b44177785f48bdddf535737ed6e7c8448b"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.0.0/RedPanda.C%2B%2B.1.0.0.win32.MinGW-w64.i686.GCC.10.3.Portable.7z",
-            "hash": "sha1:185b0d7e6eee2d83f153e03bed7424a0a74c1604"
+            "url": "https://sourceforge.net/projects/redpanda-cpp/files/1.1.5/RedPanda.C%2B%2B.1.1.5.win32.MinGW-w64.i686.GCC.8.1.Portable.7z",
+            "hash": "sha1:7bd1f580af5d90f505450c460127a330326ec4c7"
         }
     },
     "extract_dir": "RedPanda-Cpp",
@@ -26,7 +26,7 @@
     ],
     "checkver": {
         "url": "https://sourceforge.net/projects/redpanda-cpp/rss?path=/",
-        "regex": "RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
+        "regex": "RedPanda.C%2B%2B.(?<x86version>[\\d.]+).win32.MinGW-w64.i686.GCC.(?<x86gccversion>[\\d.]+).Portable.7z[\\s\\S]*?RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
     },
     "autoupdate": {
         "architecture": {
@@ -34,7 +34,7 @@
                 "url": "https://sourceforge.net/projects/redpanda-cpp/files/$version/RedPanda.C%2B%2B.$version.win64.MinGW-w64.X86_64.GCC.$matchGccversion.Portable.7z"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/$version/RedPanda.C%2B%2B.$version.win32.MinGW-w64.i686.GCC.$matchGccversion.Portable.7z"
+                "url": "https://sourceforge.net/projects/redpanda-cpp/files/$matchX86version/RedPanda.C%2B%2B.$matchX86version.win32.MinGW-w64.i686.GCC.$matchX86gccversion.Portable.7z"
             }
         }
     }
