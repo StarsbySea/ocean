@@ -1,6 +1,6 @@
 {
     "##": "It has to be installed to the default folder using the installer, otherwise it does not run.",
-    "version": "150-84c",
+    "version": "150-85b",
     "description": "Parsec is a proprietary freeware desktop capturing application primarily used for playing games through video streaming.",
     "homepage": "https://parsec.app",
     "license": {
@@ -41,7 +41,7 @@
             "while (Get-Process 'Un_A' -ErrorAction SilentlyContinue) { Start-Sleep -Second 5 }",
             "$scoop_startmenu_folder = Join-Path $([Environment]::GetFolderPath($(if ($global) {'commonstartmenu'} else {'startmenu'}))) 'Programs\\Scoop Apps'",
             "Remove-Item $scoop_startmenu_folder\\Parsec.lnk -Force"
-            ]
+        ]
     },
     "checkver": {
         "url": "https://parsec.app/changelog.xml",
