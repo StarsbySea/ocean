@@ -1,5 +1,5 @@
 {
-    "version": "2022.7.421.0",
+    "version": "2022.8.857.0",
     "description": "The WARP application uses BoringTun to encrypt all the traffic from your device and send it directly to Cloudflare's edge, ensuring that no one in between is snooping on what you're doing.",
     "homepage": "https://cloudflarewarp.com/",
     "license": {
@@ -7,7 +7,7 @@
         "url": "https://www.cloudflare.com/zh-cn/application/terms/"
     },
     "url": "https://ocean-api.deno.dev/cloudflare-warp?dl#/setup.msi_",
-    "hash": "78e33d695cef9c136563ecdbaa10c46ab0f6804475b7324023e93fa80976131c",
+    "hash": "fa0a13d6a9841897f9576a5d379ee98efedb7413450e8969ebc3a4d74abeacd6",
     "pre_install": "if (-not (is_admin)) { error 'This package requires admin privileges to install.'; break }",
     "installer": {
         "script": [
