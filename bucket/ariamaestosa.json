@@ -17,6 +17,9 @@
         }
     },
     "innosetup": true,
+    "uninstaller": {
+        "script": "if ($purge) { Remove-Item \"$env:AppData\\AriaMaestosa\" -Force -Recurse }"
+    },
     "shortcuts": [
         [
             "Aria.exe",
