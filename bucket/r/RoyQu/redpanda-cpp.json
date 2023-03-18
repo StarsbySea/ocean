@@ -5,11 +5,11 @@
         "identifier": "GPL-3.0",
         "url": "https://github.com/royqh1979/RedPanda-CPP/blob/master/LICENSE"
     },
-    "version": "2.10",
+    "version": "2.18",
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/2.10/RedPanda.C%2B%2B.2.10.win64.MinGW-w64.X86_64.GCC.11.2.Portable.7z",
-            "hash": "sha1:08881596bbd12ad9c37c1ebde9c3fedfa76b9aba"
+            "url": "https://sourceforge.net/projects/redpanda-cpp/files/2.18/RedPanda.C%2B%2B.2.18.win64.MinGW-w64.X86_64.GCC.11.2.Portable.7z",
+            "hash": "sha1:504edf223e1a7b61abed6a4acbc731c1b5bb9de9"
         },
         "32bit": {
             "url": "https://sourceforge.net/projects/redpanda-cpp/files/2.18/RedPanda.C%2B%2B.2.18.win32.MinGW-w64.i686.GCC.8.1.Portable.7z",
@@ -26,7 +26,7 @@
     ],
     "checkver": {
         "url": "https://sourceforge.net/projects/redpanda-cpp/rss?path=/",
-        "regex": "RedPanda.C%2B%2B.(?<x86version>[\\d.]+).win32.MinGW-w64.i686.GCC.(?<x86gccversion>[\\d.]+).Portable.7z[\\s\\S]*?RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z"
+        "regex": "RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.MinGW-w64.X86_64.GCC.(?<gccversion>[\\d.]+).Portable.7z[\\s\\S]*?RedPanda.C%2B%2B.(?<x86version>[\\d.]+).win32.MinGW-w64.i686.GCC.(?<x86gccversion>[\\d.]+).Portable.7z"
     },
     "autoupdate": {
         "architecture": {
