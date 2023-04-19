@@ -1,5 +1,6 @@
 # Scoop ocean Bucket
-[![App Manifests](https://img.shields.io/github/directory-file-count/StarsbySea/ocean/bucket?color=informational&label=App%20Manifests)](https://github.com/StarsbySea/ocean/tree/main/bucket) [![GitHub stars](https://img.shields.io/github/stars/StarsbySea/ocean)](https://github.com/StarsbySea/ocean/stargazers) [![Tests](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml) [![Excavator](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml)
+
+[![App Manifests](https://img.shields.io/badge/App%20Manifests-27-informational)](https://github.com/StarsbySea/ocean/tree/main/bucket) [![GitHub stars](https://img.shields.io/github/stars/StarsbySea/ocean)](https://github.com/StarsbySea/ocean/stargazers) [![Tests](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml) [![Excavator](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml)
 
 A bucket designed to collect niche but useful software.
 
@@ -8,9 +9,15 @@ A bucket designed to collect niche but useful software.
 
 `scoop bucket add ocean 'https://github.com/StarsbySea/ocean.git'`
 
-2. install software
+2. install apps from this bucket
 
 `scoop install ocean/whatever`
+
+## List of applications in this bucket
+
+See [this page](https://scoop.sh/#/apps?q=%22https%3A%2F%2Fgithub.com%2FStarsbySea%2Focean%22&s=1&d=0&o=false&p=1)
+for a list of applications in this bucket with descriptions.
+
 
 ## Feature Apps
 | Application          | Description                                                                                                       | Install                                                                                        |
