@@ -35,10 +35,10 @@
             "$cont = (Invoke-WebRequest $url).Content",
             "$r = 'href.*/CAJViewer([\\w ._]+)_x64.*64-bit' ",
             "if (!($cont -match $r)) { error \"Could not match $r in $url\"; break }",
-            "$version64 = $matches[1]",
+            "$version64 = [uri]::EscapeDataString($matches[1])",
             "$r = 'href.*/CAJViewer([\\w ._]+)-setup.*32-bit' ",
             "if (!($cont -match $r)) { error \"Could not match $r in $url\"; continue }",
-            "$version32 = $matches[1]",
+            "$version32 = [uri]::EscapeDataString($matches[1])",
             "Write-Host $version $version64 $version32",
             "Write-Output $version $version64 $version32"
         ],
