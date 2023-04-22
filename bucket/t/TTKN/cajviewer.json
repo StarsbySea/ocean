@@ -5,7 +5,7 @@
     "license": "Freeware",
     "architecture": {
         "64bit": {
-            "url": "https://download.cnki.net/CAJViewer 8.1_x64-setup.exe#/dl.7z",
+            "url": "https://download.cnki.net/CAJViewer%208.1_x64-setup.exe#/dl.7z",
             "hash": "1ccc7c60a62ecf1083fc4d49da462aceacefa6193275114209c53fc2837184eb"
         },
         "32bit": {
