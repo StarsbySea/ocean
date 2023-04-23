@@ -39,10 +39,9 @@
             "$r = 'href.*/CAJViewer([\\w ._]+)-setup.*32-bit' ",
             "if (!($cont -match $r)) { error \"Could not match $r in $url\"; continue }",
             "$version32 = [uri]::EscapeDataString($matches[1])",
-            "Write-Host $version $version64 $version32",
             "Write-Output $version $version64 $version32"
         ],
-        "regex": "([\\d.]+) (?<version64>[\\w ._-]+) (?<version32>[\\w ._-]+)"
+        "regex": "([\\d.]+) (?<version64>[\\S\\s._-]+) (?<version32>[\\w ._-]+)"
     },
     "autoupdate": {
         "architecture": {
