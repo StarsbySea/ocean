@@ -40,7 +40,6 @@
             "$headers.Add(\"User-Agent\", \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0\")",
             "$headers.Add(\"Cookie\", \"JSESSIONID=A086EE0BD0F5985F8691B4946214C383; COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en\")",
             "$cont = $(Invoke-WebRequest -Uri \"https://www.holtek.com/ice\" -Headers $headers).Content",
-            "Write-Host $cont",
             "Write-Output $cont"
         ],
         "regex": "documents/(?<path1>[\\w]+)/(?<path2>[\\w]+)/HT-IDE3KV([\\d])([\\d]+)_Setup.zip/9f0f1311-eed7-4825-8cb9-37531bde38f7",
