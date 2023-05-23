@@ -1,0 +1,31 @@
+{
+    "version": "9.8.2.12967",
+    "description": "An instant messaging tool that gives you the best way to keep in touch with your friends and family.",
+    "homepage": "https://im.qq.com",
+    "license": {
+        "identifier": "Proprietary",
+        "url": "https://ti.qq.com/agreement/index.html"
+    },
+    "notes": [
+        "Scoop doesn't persist your QQ data, by default they are stored in: ",
+        "'%UserProfile%\\Documents\\Tencent Files'.",
+        "Files produced at runtime leaves in '%AppData%\\Tencent'."
+    ],
+    "url": "https://dldir1.qq.com/qqfile/qq/QQNT/e2c549d2/QQ9.8.2.12967.exe#/dl.7z",
+    "hash": "b57495963f336f550935350724d76400dad5331b2fb6da6d828827e6f2c3c31d",
+    "extract_dir": "Files",
+    "shortcuts": [
+        [
+            "QQ.exe",
+            "QQ"
+        ]
+    ],
+    "post_install": "Remove-Item \"$dir\\Uninstall.exe\" -Recurse",
+    "checkver": {
+        "url": "https://bbs.pcbeta.com/viewthread-1966472-1-1.html",
+        "regex": "(?<commit>[\\w]+)/QQ([\\d.]+).exe"
+    },
+    "autoupdate": {
+        "url": "https://dldir1.qq.com/qqfile/qq/QQNT/$matchCommit/QQ$version.exe#/dl.7z"
+    }
+}
