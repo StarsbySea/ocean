@@ -1,10 +1,10 @@
 {
-    "version": "8.13",
+    "version": "8.14",
     "description": "The HT-IDE3000 is an integrated development environment for designing 8-bit MCU applications.",
     "homepage": "https://www.bing.com/search?q=%22https%3A%2F%2Fwww.holtek.com%22",
     "license": "Freeware",
-    "url": "https://www.holtek.com/documents/10179/108746/HT-IDE3KV813_Setup.zip#/dl.zip",
-    "hash": "0ad43a20a5e4b224bc0b0e8691ac8d69026ec6476c0c630f8b0bf9f571660ee1",
+    "url": "https://www.holtek.com/documents/10179/108746/HT-IDE3KV814_Setup.zip#/dl.zip",
+    "hash": "0c53c5685433a1b469f2b46fcac4619f1d2cbf0a3d0f28bd60652c1d9cac385e",
     "installer": {
         "script": "Get-Item \"$dir\\HT-IDE3K*Setup.exe\" | Expand-InnoArchive -Destination \"$dir\" -Removal"
     },
