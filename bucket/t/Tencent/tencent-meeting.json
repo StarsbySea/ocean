@@ -6,7 +6,7 @@
         "identifier": "Proprietary",
         "url": "https://meeting.tencent.com/declare.html"
     },
-    "url": "https://updatecdn.meeting.qq.com/cos/fca0128939da295b4fcc51937929cd2e/TencentMeeting_0300000000_3.17.5.403.publish.exe#/dl.7z",
+    "url": "https://updatecdnv6.meeting.qq.com/cos/fca0128939da295b4fcc51937929cd2e/TencentMeeting_0300000000_3.17.5.403.publish.exe#/dl.7z",
     "hash": "md5:fca0128939da295b4fcc51937929cd2e",
     "pre_install": "Rename-Item -Path \"$dir\\`$_*\" -NewName \"$version\" -Force",
     "installer": {
@@ -33,7 +33,7 @@
         "regex": "\"md5\":\"(?<hash>[a-f0-9]+)\".+\"version\":\"([\\d\\.]+)\""
     },
     "autoupdate": {
-        "url": "https://updatecdn.meeting.qq.com/cos/$matchHash/TencentMeeting_0300000000_$version.publish.exe#/dl.7z",
+        "url": "https://updatecdnv6.meeting.qq.com/cos/$matchHash/TencentMeeting_0300000000_$version.publish.exe#/dl.7z",
         "hash": {
             "url": "https://meeting.tencent.com/web-service/query-download-info?q=%5B%7B%22package-type%22:%22app%22,%22channel%22:%220300000000%22,%22platform%22:%22windows%22%7D%5D&nonce=AAAAAAAAAAAAAAAA",
             "mode": "json",
