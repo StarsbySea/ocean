@@ -29,13 +29,13 @@
         ]
     ],
     "checkver": {
-        "url": "https://voovmeeting.com/web-service/query-download-info?q=[{%22package-type%22%3A%22app%22%2C%22channel%22%3A%221410000197%22%2C%22platform%22%3A%22windows%22%2C%22decorators%22%3A[%22intl%22]}]&nonce=AAAAAAAAAAAAAAAA",
+        "url": "https://voovmeeting.com/web-service/query-download-info?q=%5B%7B%22package-type%22:%22app%22,%22channel%22:%221410000197%22,%22platform%22:%22windows%22,%22decorators%22:%5B%22intl%22%5D%7D%5D&nonce=AAAAAAAAAAAAAAAA",
         "regex": "\"md5\":\"(?<hash>[a-f0-9]+)\".+\"version\":\"([\\d\\.]+)\""
     },
     "autoupdate": {
         "url": "https://updatecdnv6.meeting.qq.com/cos/$matchHash/VooVMeeting_1410000197_$version.publish.exe#/dl.7z",
         "hash": {
-            "url": "https://voovmeeting.com/web-service/query-download-info?q=[{%22package-type%22%3A%22app%22%2C%22channel%22%3A%221410000197%22%2C%22platform%22%3A%22windows%22%2C%22decorators%22%3A[%22intl%22]}]&nonce=AAAAAAAAAAAAAAAA",
+            "url": "https://voovmeeting.com/web-service/query-download-info?q=%5B%7B%22package-type%22:%22app%22,%22channel%22:%221410000197%22,%22platform%22:%22windows%22,%22decorators%22:%5B%22intl%22%5D%7D%5D&nonce=AAAAAAAAAAAAAAAA",
             "mode": "json",
             "jsonpath": "$.info-list[0].md5"
         }
