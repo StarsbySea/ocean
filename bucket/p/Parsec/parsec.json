@@ -1,6 +1,6 @@
 {
     "##": "It has to be installed to the default folder using the installer, otherwise it does not run.",
-    "version": "150-89c",
+    "version": "150-89d",
     "description": "Parsec is a proprietary freeware desktop capturing application primarily used for playing games through video streaming.",
     "homepage": "https://parsec.app",
     "license": {
