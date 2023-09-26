@@ -1,6 +1,6 @@
 {
     "##": "It has to be installed to the default folder using the installer, otherwise it does not run.",
-    "version": "150-89d",
+    "version": "150-90",
     "description": "Parsec is a proprietary freeware desktop capturing application primarily used for playing games through video streaming.",
     "homepage": "https://parsec.app",
     "license": {
@@ -10,11 +10,11 @@
     "architecture": {
         "32bit": {
             "url": "https://builds.parsecgaming.com/package/parsec-windows32.exe",
-            "hash": "f61c70d979155e4a7cb30000c91fdb897030777436f5f8a813896b1e1147b24e"
+            "hash": "9bd8b6393c6806bee6c0fc389f5dd9032dd3327d3f54af32520081c45d365725"
         },
         "64bit": {
             "url": "https://builds.parsecgaming.com/package/parsec-windows.exe",
-            "hash": "26ad62d32de464eab6e08a3aa5957523381209854a98144409a29348b88b74be"
+            "hash": "e1346b9cc2ed444075655c5dfc484f2b2706ed509ce3c1f732383529ea763334"
         }
     },
     "pre_install": "if (!(is_admin)) {error 'This package requires admin rights to install'; break}",
