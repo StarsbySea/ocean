@@ -10,6 +10,9 @@
     "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/4.9.2/geph-windows-setup.exe",
     "hash": "6a62e2fd2058003bec281d754a1b1254465b2f5a060ee975f8f3665a5bc9e7ff",
     "innosetup": true,
+    "uninstaller": {
+        "script": "if ($purge) { Remove-Item \"$env:LocalAppData\\geph4-logs.db\" -Force -ErrorAction SilentlyContinue; Remove-Item \"$env:AppData\\geph4-credentials\" -Force -Recurse -ErrorAction SilentlyContinue}"
+    },
     "shortcuts": [
         [
             "gephgui-wry.exe",
