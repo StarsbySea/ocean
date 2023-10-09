@@ -13,7 +13,13 @@
         "script": "Remove-Item \"$dir\\*\" -Exclude ('geph4-client.exe','winproxy-stripped.exe') -Force -Recurse"
     },
     "uninstaller": {
-        "script": "if ($purge) { Remove-Item \"$env:LocalAppData\\geph4-logs.db\" -Force -ErrorAction SilentlyContinue; Remove-Item \"$env:AppData\\geph4-credentials\" -Force -Recurse -ErrorAction SilentlyContinue}"
+        "script": [
+            "if ($purge) {",
+            "    Remove-Item \"$env:LocalAppData\\geph4-logs.db\" -Force -ErrorAction SilentlyContinue",
+            "    Remove-Item \"$env:AppData\\geph4-credentials\" -Force -Recurse -ErrorAction SilentlyContinue",
+            "    Remove-Item \"$env:AppData\\EBWebView\" -Force -Recurse -ErrorAction SilentlyContinue",
+            "}"
+        ]
     },
     "bin": "geph4-client.exe",
     "checkver": {
