@@ -1,13 +1,13 @@
 {
-    "version": "3.16.9.533",
+    "version": "3.16.10.510",
     "description": "Cloud meeting solutions covering 100+ countries and regions.",
     "homepage": "https://voovmeeting.com/",
     "license": {
         "identifier": "Proprietary",
         "url": "https://voovmeeting.com/df/en/service-agreement.html"
     },
-    "url": "https://updatecdnv6.meeting.qq.com/cos/d76d6f71642c89d1bad18daa3e7844b9/VooVMeeting_1410000197_3.16.9.533.publish.exe#/dl.7z",
-    "hash": "md5:d76d6f71642c89d1bad18daa3e7844b9",
+    "url": "https://updatecdnv6.meeting.qq.com/cos/a8cddeaa15826839541bb660756aeff0/VooVMeeting_1410000197_3.16.10.510.publish.exe#/dl.7z",
+    "hash": "md5:a8cddeaa15826839541bb660756aeff0",
     "pre_install": "Rename-Item -Path \"$dir\\`$_*\" -NewName \"$version\" -Force",
     "installer": {
         "script": [
