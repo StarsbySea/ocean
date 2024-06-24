@@ -1,13 +1,13 @@
 {
-    "version": "3.26.11.412",
+    "version": "3.27.5.410",
     "description": "腾讯会议",
     "homepage": "https://meeting.tencent.com/",
     "license": {
         "identifier": "Proprietary",
         "url": "https://meeting.tencent.com/declare.html"
     },
-    "url": "https://updatecdnv6.meeting.qq.com/cos/70cb9a5a25dcb201db07c7ab07be3f2b/TencentMeeting_0300000000_3.26.11.412.publish.exe#/dl.7z",
-    "hash": "md5:70cb9a5a25dcb201db07c7ab07be3f2b",
+    "url": "https://updatecdnv6.meeting.qq.com/cos/de2698ab5794d07df68994146804481c/TencentMeeting_0300000000_3.27.5.410.publish.exe#/dl.7z",
+    "hash": "md5:de2698ab5794d07df68994146804481c",
     "pre_install": "Rename-Item -Path \"$dir\\`$_*\" -NewName \"$version\" -Force",
     "installer": {
         "script": [
