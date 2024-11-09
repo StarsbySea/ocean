@@ -8,7 +8,7 @@
     },
     "notes": "If the GUI does not work properly, you may install Microsoft Edge WebView2 Runtime ($dir\\MicrosoftEdgeWebview2Setup.exe) manually.",
     "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/4.99.16/geph-windows-setup.exe",
-    "hash": "578d30b39baf050c22136dc5e2f29ac0d6b30a02cc3bef5f47b9c3f2f7860a6e",
+    "hash": "7025bbbb762482dd27136d3e5674e32faa12c7e7ee1b22cf52f00449d26d042d",
     "innosetup": true,
     "uninstaller": {
         "script": [
