@@ -1,13 +1,13 @@
 {
-    "version": "5.0.0",
+    "version": "5.0.1",
     "description": "Geph is a modular Internet censorship circumvention system designed specifically to deal with national filtering. ",
     "homepage": "https://geph.io/",
     "license": {
         "identifier": "GPL-3.0",
         "url": "https://github.com/geph-official/geph4-client/blob/master/LICENSE.md"
     },
-    "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/5.0.0/geph-windows-setup.exe",
-    "hash": "f820a9df11a2278960aa256eb092036c06e4b44a582972d47388830877eae29d",
+    "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/5.0.1/geph-windows-setup.exe",
+    "hash": "a94b70400a351085735aaa313075a2d4180aa257a287035e366c618aeb1512d2",
     "innosetup": true,
     "installer": {
         "script": "Remove-Item \"$dir\\*\" -Exclude ('geph4-client.exe','winproxy-stripped.exe') -Force -Recurse"
