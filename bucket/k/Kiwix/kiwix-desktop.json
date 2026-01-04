@@ -5,9 +5,9 @@
         "identifier": "GPL-3.0",
         "url": "https://github.com/kiwix/kiwix-desktop/blob/master/LICENSE"
     },
-    "version": "2.5.0-1",
-    "url": "https://download.kiwix.org/release/kiwix-desktop/kiwix-desktop_windows_x64_2.5.0-1.zip",
-    "hash": "2f422e29bd632ae19ac00083144674c60724f99d8e38962a29a09aec9b3d28f3",
+    "version": "2.5.1",
+    "url": "https://download.kiwix.org/release/kiwix-desktop/kiwix-desktop_windows_x64_2.5.1.zip",
+    "hash": "56ad5b3a86010c2c74db63a717d087cfbdcdbe71a0d7fca0655f90ef1d80593f",
     "installer": {
         "script": "Move-Item \"$dir\\kiwix-desktop_windows_x64_$version\\*\" \"$dir\\\""
     },
