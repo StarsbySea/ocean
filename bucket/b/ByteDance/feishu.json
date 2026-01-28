@@ -1,5 +1,5 @@
 {
-    "version": "7.60.8",
+    "version": "7.61.6",
     "description": "The Next-Gen Collaboration Suite",
     "homepage": "https://www.feishu.cn/",
     "license": {
@@ -7,8 +7,8 @@
         "url": "https://www.feishu.cn/en/terms"
     },
     "notes": "Runtime data are stored in '%APPDATA%\\LarkShell', and are not persisted by Scoop.",
-    "url": "https://sf3-cn.feishucdn.com/obj/ee-appcenter/36d88e8c/Feishu-win32_ia32-7.60.8-signed.exe#/dl.7z",
-    "hash": "md5:d63560406a38b162c1bbdb4c16b650f3",
+    "url": "https://sf3-cn.feishucdn.com/obj/ee-appcenter/8683940a/Feishu-win32_ia32-7.61.6-signed.exe#/dl.7z",
+    "hash": "md5:1075a3664819a149e2d72d7cca01365f",
     "extract_to": "app",
     "shortcuts": [
         [
