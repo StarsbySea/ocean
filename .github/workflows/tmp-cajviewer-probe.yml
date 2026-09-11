@@ -11,20 +11,28 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe official CAJViewer installers
+      - name: Probe updater metadata and range support
         shell: bash
         run: |
-          set -euo pipefail
-          urls=(
-            'https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'
-            'https://cajviewer.oversea.cnki.net/down/CAJViewer8.0.1.1-setup.exe'
+          set -u
+          echo '=== updater metadata candidates ==='
+          candidates=(
+            'https://cajviewer.oversea.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
+            'https://cajviewer.oversea.cnki.net/down/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
+            'https://cajviewer.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
+            'https://download.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
           )
-          names=('x64' 'x86')
-          for i in 0 1; do
-            echo "--- ${names[$i]} HEAD ---"
-            curl -k -fLI --max-time 30 --retry 1 -A 'Mozilla/5.0' "${urls[$i]}" | grep -Ei '^(HTTP/|content-type:|content-length:|last-modified:|etag:)' || true
-            echo "--- ${names[$i]} download/hash ---"
-            curl -k -fL --max-time 180 --retry 1 -A 'Mozilla/5.0' "${urls[$i]}" -o "caj-${names[$i]}.exe"
-            sha256sum "caj-${names[$i]}.exe"
-            stat -c '%n size=%s' "caj-${names[$i]}.exe"
+          for u in "${candidates[@]}"; do
+            echo "--- $u"
+            curl -k -L --max-time 20 -A 'Mozilla/5.0' -sS -D headers.txt "$u" -o body.txt
+            rc=$?
+            grep -Ei '^(HTTP/|content-type:|content-length:|location:)' headers.txt || true
+            echo "curl_rc=$rc bytes=$(wc -c < body.txt 2>/dev/null || echo 0)"
+            head -c 800 body.txt 2>/dev/null || true; echo
           done
+          echo '=== x64 range probe ==='
+          u='https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'
+          curl -k -L --max-time 30 -A 'Mozilla/5.0' -r 0-1048575 -D range-headers.txt "$u" -o range.bin
+          rc=$?
+          grep -Ei '^(HTTP/|content-range:|accept-ranges:|content-length:)' range-headers.txt || true
+          echo "range_rc=$rc bytes=$(wc -c < range.bin 2>/dev/null || echo 0)"
