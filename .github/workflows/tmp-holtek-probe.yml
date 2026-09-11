@@ -11,38 +11,48 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Query Holtek tools software search API
+      - name: Narrow Holtek search to IDE3000 records
         shell: bash
         run: |
           set -euo pipefail
           api='https://www.holtek.com.cn/webapi/api/Page/GetSearchResult'
-          for lang in 1 2 3; do
-            for sub in '' 'Tools Software'; do
-              echo "===== lang=$lang sub=$sub ====="
-              python3 - "$lang" "$sub" > body.json <<'PY'
-          import json,sys
-          lang=int(sys.argv[1]); sub=sys.argv[2]
-          category={1:'資源',2:'资源',3:'Resource'}[lang] if sub else ''
-          print(json.dumps({
-            'Keyword':'HT-IDE3000',
-            'CLanguageType':lang,
-            'Category':category,
-            'SubCategory':sub,
-            'PageIndex':1,
-            'PageSize':50
-          },ensure_ascii=False))
-          PY
-              curl -fL --max-time 30 --retry 1 -A 'Mozilla/5.0' \
-                -H 'Content-Type: application/json' \
-                --data-binary @body.json "$api" -o result.json
-              python3 - <<'PY'
+          python3 - <<'PY' > requests.json
           import json
-          obj=json.load(open('result.json',encoding='utf-8'))
-          print('StatusCode=',obj.get('StatusCode'),'TotalItems=',obj.get('TotalItems'))
-          entries=obj.get('Entries') or {}
-          print('CategoryList=',entries.get('CategoryList'))
-          for item in entries.get('SearchList') or []:
+          reqs=[]
+          for kw in ['HT-IDE3000','IDE3000','HT-IDE']:
+            for cat,sub in [
+              ('',''),
+              ('Web Content','Tools'),
+              ('News','Tools News'),
+              ('Resource','Tools Software'),
+              ('Resource','Others')
+            ]:
+              reqs.append({'Keyword':kw,'CLanguageType':3,'Category':cat,'SubCategory':sub,'PageIndex':1,'PageSize':100})
+          print(json.dumps(reqs))
+          PY
+          python3 - <<'PY'
+          import json,subprocess,re,tempfile,os
+          api='https://www.holtek.com.cn/webapi/api/Page/GetSearchResult'
+          reqs=json.load(open('requests.json'))
+          seen=set()
+          for req in reqs:
+            body=json.dumps(req)
+            p=subprocess.run(['curl','-fsSL','--max-time','30','--retry','1','-A','Mozilla/5.0','-H','Content-Type: application/json','--data-binary',body,api],capture_output=True,text=True)
+            if p.returncode:
+              print('ERROR',req,p.stderr.strip()); continue
+            try: obj=json.loads(p.stdout)
+            except Exception as e:
+              print('JSON ERROR',req,repr(e),p.stdout[:300]); continue
+            entries=obj.get('Entries') or {}
+            items=entries.get('SearchList') or []
+            matches=[]
+            for item in items:
+              text=' '.join(str(item.get(k,'')) for k in ('Title','Content','PageURL','Type1','Type2'))
+              if re.search(r'IDE\s*-?\s*3000|HT-IDE',text,re.I):
+                key=json.dumps(item,ensure_ascii=False,sort_keys=True)
+                if key not in seen:
+                  seen.add(key); matches.append(item)
+            print('\n===',req,'Status=',obj.get('StatusCode'),'Total=',obj.get('TotalItems'),'returned=',len(items),'IDE matches=',len(matches),'===')
+            for item in matches:
               print(json.dumps(item,ensure_ascii=False))
           PY
-            done
-          done
