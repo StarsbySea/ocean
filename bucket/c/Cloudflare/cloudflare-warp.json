@@ -1,13 +1,13 @@
 {
-    "version": "2025.1.861.0",
+    "version": "2026.7.1376.0",
     "description": "The WARP application uses BoringTun to encrypt all the traffic from your device and send it directly to Cloudflare's edge, ensuring that no one in between is snooping on what you're doing.",
     "homepage": "https://cloudflarewarp.com/",
     "license": {
         "identifier": "Freeware",
         "url": "https://www.cloudflare.com/zh-cn/application/terms/"
     },
-    "url": "https://ocean-api.deno.dev/cloudflare-warp?dl#/setup.msi_",
-    "hash": "5d3d2fcca081de37a4ccfd8b29d7420cef852b6171973c4f047c96731e1dd566",
+    "url": "https://downloads.cloudflareclient.com/v1/download/windows/version/2026.7.1376.0#/setup.msi_",
+    "hash": "1a987075524fc570ef53bf9cf5e868a9bc878f56376d86ce9f8c6d674fc76195",
     "pre_install": "if (-not (is_admin)) { error 'This package requires admin privileges to install.'; break }",
     "installer": {
         "script": [
@@ -24,10 +24,13 @@
         "script": "cmd /c (((Get-ItemProperty -Path HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Where-Object {$_.DisplayName -eq \"Cloudflare WARP\"} | Select-Object -Expand UninstallString))+ \" /norestart\")"
     },
     "checkver": {
-        "url": "https://ocean-api.deno.dev/cloudflare-warp",
-        "jsonpath": "$.version"
+        "script": [
+            "$releases = Invoke-RestMethod 'https://api.github.com/repos/cloudflare/cloudflare-docs/contents/src/content/warp-releases/windows/ga'",
+            "($releases.name -replace '\\.yaml$' | ForEach-Object { [version]$_ } | Sort-Object -Descending | Select-Object -First 1).ToString()"
+        ],
+        "regex": "([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://ocean-api.deno.dev/cloudflare-warp?dl#/setup.msi_"
+        "url": "https://downloads.cloudflareclient.com/v1/download/windows/version/$version#/setup.msi_"
     }
 }
