@@ -26,15 +26,15 @@
     ],
     "checkver": {
         "url": "https://sourceforge.net/projects/redpanda-cpp/rss?path=/",
-        "regex": "RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.No.Compiler.Portable.7z"
+        "regex": "RedPanda.C%2B%2B.(?<version>[\\d.]+).win64.NoCompiler.Portable.7z"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win64.No.Compiler.Portable.7z"
+                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win64.NoCompiler.Portable.7z"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win32.No.Compiler.Portable.7z"
+                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win32.NoCompiler.Portable.7z"
             }
         }
     }
