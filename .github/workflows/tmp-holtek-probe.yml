@@ -11,23 +11,38 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Extract Holtek search and resource API routes
+      - name: Query Holtek tools software search API
         shell: bash
         run: |
           set -euo pipefail
-          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' 'https://www.holtek.com.cn/main.d158c34aecaf41c9.js' -o main.js
-          python3 - <<'PY'
-          import re
-          text=open('main.js','r',encoding='utf-8',errors='ignore').read()
-          patterns=[
-            r'GetSearch',r'SearchList',r'SearchResult',r'FullText',r'Keyword',
-            r'Tools Software',r'ToolSoftware',r'Resource',r'DownloadFile',r'Download',
-            r'GetCategoriesPage',r'contentlist',r'toolnews'
-          ]
-          for pat in patterns:
-              ms=list(re.finditer(pat,text,re.I))
-              print(f'\n===== {pat} ({len(ms)}) =====')
-              for m in ms[:20]:
-                  s=max(0,m.start()-320); e=min(len(text),m.end()+520)
-                  print(text[s:e].replace('\\n',' ').replace('\\r',' '))
+          api='https://www.holtek.com.cn/webapi/api/Page/GetSearchResult'
+          for lang in 1 2 3; do
+            for sub in '' 'Tools Software'; do
+              echo "===== lang=$lang sub=$sub ====="
+              python3 - "$lang" "$sub" > body.json <<'PY'
+          import json,sys
+          lang=int(sys.argv[1]); sub=sys.argv[2]
+          category={1:'資源',2:'资源',3:'Resource'}[lang] if sub else ''
+          print(json.dumps({
+            'Keyword':'HT-IDE3000',
+            'CLanguageType':lang,
+            'Category':category,
+            'SubCategory':sub,
+            'PageIndex':1,
+            'PageSize':50
+          },ensure_ascii=False))
           PY
+              curl -fL --max-time 30 --retry 1 -A 'Mozilla/5.0' \
+                -H 'Content-Type: application/json' \
+                --data-binary @body.json "$api" -o result.json
+              python3 - <<'PY'
+          import json
+          obj=json.load(open('result.json',encoding='utf-8'))
+          print('StatusCode=',obj.get('StatusCode'),'TotalItems=',obj.get('TotalItems'))
+          entries=obj.get('Entries') or {}
+          print('CategoryList=',entries.get('CategoryList'))
+          for item in entries.get('SearchList') or []:
+              print(json.dumps(item,ensure_ascii=False))
+          PY
+            done
+          done
