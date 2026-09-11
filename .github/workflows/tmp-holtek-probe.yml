@@ -11,28 +11,31 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect Holtek frontend API routes
+      - name: Inspect Holtek root frontend API routes
         shell: bash
         run: |
           set -euo pipefail
-          base='https://www.holtek.com.cn/page/'
-          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' "${base}main.d158c34aecaf41c9.js" -o main.js
-          echo '--- bundle size ---'
+          url='https://www.holtek.com.cn/main.d158c34aecaf41c9.js'
+          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' -D headers.txt "$url" -o main.js
+          echo '--- response headers ---'
+          grep -Ei '^(HTTP/|content-type:|content-length:)' headers.txt || true
+          echo '--- bundle size/prefix ---'
           wc -c main.js
+          head -c 120 main.js; echo
           echo '--- strings around contentDetail / download / file APIs ---'
           python3 - <<'PY'
           import re
           text=open('main.js','r',encoding='utf-8',errors='ignore').read()
-          pats=[r'contentDetail',r'download',r'attach',r'webapi',r'/api/',r'file',r'document']
+          pats=[r'contentDetail',r'download',r'attach',r'webapi',r'/api/',r'file',r'document',r'contentList']
           seen=set()
           for pat in pats:
               for m in re.finditer(pat,text,re.I):
-                  s=max(0,m.start()-180); e=min(len(text),m.end()+260)
+                  s=max(0,m.start()-220); e=min(len(text),m.end()+340)
                   chunk=text[s:e].replace('\\n',' ').replace('\\r',' ')
                   if chunk not in seen:
                       seen.add(chunk)
                       print('\n---',pat,'---')
                       print(chunk)
-                  if len(seen)>=120:
+                  if len(seen)>=100:
                       raise SystemExit
           PY
