@@ -21,9 +21,7 @@
         "Remove-Item HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\iSlide Tools -Recurse"
     ],
     "uninstaller": {
-        "script": [
-            "Invoke-ExternalCommand \"$dir\\uninst.exe\" -ArgumentList '/S' | Out-Null"
-        ]
+        "script": "Invoke-ExternalCommand \"$dir\\uninst.exe\" -ArgumentList '/S' | Out-Null"
     },
     "shortcuts": [
         [
