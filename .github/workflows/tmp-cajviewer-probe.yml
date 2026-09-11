@@ -9,20 +9,22 @@ on:
 
 jobs:
   probe:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Probe official CAJViewer installers
-        shell: pwsh
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Stop'
-          $files = @(
-            @{ Name = 'x64'; Url = 'https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'; Path = 'caj-x64.exe' },
-            @{ Name = 'x86'; Url = 'https://cajviewer.oversea.cnki.net/down/CAJViewer8.0.1.1-setup.exe'; Path = 'caj-x86.exe' }
+          set -euo pipefail
+          urls=(
+            'https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'
+            'https://cajviewer.oversea.cnki.net/down/CAJViewer8.0.1.1-setup.exe'
           )
-          foreach ($f in $files) {
-            Invoke-WebRequest -Uri $f.Url -OutFile $f.Path -UseBasicParsing
-            $hash = (Get-FileHash $f.Path -Algorithm SHA256).Hash.ToLowerInvariant()
-            $info = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Resolve-Path $f.Path))
-            Write-Host "$($f.Name) SHA256=$hash"
-            Write-Host "$($f.Name) FileVersion=$($info.FileVersion) ProductVersion=$($info.ProductVersion) Size=$((Get-Item $f.Path).Length)"
-          }
+          names=('x64' 'x86')
+          for i in 0 1; do
+            echo "--- ${names[$i]} HEAD ---"
+            curl -k -fLI --max-time 30 --retry 1 -A 'Mozilla/5.0' "${urls[$i]}" | grep -Ei '^(HTTP/|content-type:|content-length:|last-modified:|etag:)' || true
+            echo "--- ${names[$i]} download/hash ---"
+            curl -k -fL --max-time 180 --retry 1 -A 'Mozilla/5.0' "${urls[$i]}" -o "caj-${names[$i]}.exe"
+            sha256sum "caj-${names[$i]}.exe"
+            stat -c '%n size=%s' "caj-${names[$i]}.exe"
+          done
