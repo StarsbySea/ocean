@@ -1,5 +1,5 @@
 {
-    "version": "9.9.7.21484",
+    "version": "9.9.33.260813",
     "description": "An instant messaging tool that gives you the best way to keep in touch with your friends and family, build with Electron.",
     "homepage": "https://im.qq.com/pcqq/index.shtml",
     "license": {
@@ -8,12 +8,12 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://dldir1v6.qq.com/qqfile/qq/QQNT/897bf087/QQ9.9.7.21484_x64.exe#/dl.7z",
-            "hash": "97ff95d3ff4055449912f4702f283c079efb4df872c2ad288a1993e4a661bff9"
+            "url": "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.33/release/497e2f1f/QQ_9.9.33_260813_x64_01.exe#/dl.7z",
+            "hash": "b25c0d3ce9df764074a9118d0ded927e1b2d7ebf60e306112e8df18a040ec492"
         },
         "32bit": {
-            "url": "https://dldir1v6.qq.com/qqfile/qq/QQNT/340572d2/QQ9.9.7.21484_x86.exe#/dl.7z",
-            "hash": "fca60b9b6e813c5f266cc6b6e076465702d1352de17cfb765c618bbab29366e1"
+            "url": "https://qqdl.gtimg.cn/qqfile/QQNT/9.9.33/release/497e2f1f/QQ_9.9.33_260813_x86_01.exe#/dl.7z",
+            "hash": "fd7214c7a70a6e0eb46781e0d653d5c56b0d496d2f710b4d5c07939c40b73be6"
         }
     },
     "extract_dir": "Files",
@@ -37,16 +37,25 @@
         "script": "if ($cmd -eq 'uninstall') { Remove-Item -Path \"$env:PUBLIC\\Documents\\Tencent\\QQ\\UserDataInfo.ini\" -Force -ErrorAction SilentlyContinue | Out-Null }"
     },
     "checkver": {
-        "url": "https://cdn-go.cn/qq-web/im.qq.com_new/latest/rainbow/windowsDownloadUrl.js",
-        "regex": "\"ntDownloadUrl\":\"https://dldir1.qq.com/qqfile/qq/QQNT/(?<commit32>[\\w]+)/QQ(?<version32>[\\d.]+)_x86.exe\",\\S+\"ntDownloadX64Url\":\"https://dldir1.qq.com/qqfile/qq/QQNT/(?<commit>[\\w]+)/QQ([\\d.]+)_x64.exe\","
+        "script": [
+            "# Please keep this script. Using 'cdn-go.cn' may result in receiving expired cache responses.",
+            "$url = 'https://cdn-go.cn/qq-web/im.qq.com_new/latest/rainbow/windowsConfig.js'",
+            "$hostname = ([Uri]$url).Host",
+            "$records = Resolve-DnsName 'cdn-go.cn.cloud.tc.qq.com' -Type A -DnsOnly -ErrorAction Ignore",
+            "$ip = $records | Where-Object { $_.QueryType -eq 'A' -and $_.IPAddress } | Select-Object -ExpandProperty IP4Address -First 1",
+            "$url = $url -Replace [regex]::Escape($hostname), $ip",
+            "Invoke-WebRequest -Uri $url -UseBasicParsing -Headers @{'Host' = $hostname} | Select-Object -ExpandProperty Content"
+        ],
+        "regex": "QQNT/(.*?)/QQ_([\\d.]+)_([\\d]+)_x86_01.exe",
+        "replace": "${2}.${3}"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://dldir1v6.qq.com/qqfile/qq/QQNT/$matchCommit/QQ$version_x64.exe#/dl.7z"
+                "url": "https://qqdl.gtimg.cn/qqfile/QQNT/$match1/QQ_$match2_$match3_x64_01.exe#/dl.7z"
             },
             "32bit": {
-                "url": "https://dldir1v6.qq.com/qqfile/qq/QQNT/$matchCommit32/QQ$version_x86.exe#/dl.7z"
+                "url": "https://qqdl.gtimg.cn/qqfile/QQNT/$match1/QQ_$match2_$match3_x86_01.exe#/dl.7z"
             }
         }
     }
