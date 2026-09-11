@@ -1,10 +1,10 @@
 {
-    "version": "1.0.0.3823",
+    "version": "1.1.0.4632",
     "description": "PDFPatcher is a tool for modifying information in PDF files. (Chinese language only)",
     "homepage": "https://github.com/wmjordan/PDFPatcher",
     "license": "Freeware",
-    "url": "https://github.com/wmjordan/PDFPatcher/files/7999822/PDFPatcher.1.0.0.3823.7z.zip",
-    "hash": "C7A023FA373CB1B64A72649847FAA5644EBA63388B0AD5026C4FD27DA9F1DA5E",
+    "url": "https://github.com/wmjordan/PDFPatcher/releases/download/v1.1/PDFPatcher.1.1.0.4632.7z",
+    "hash": "624d839cc860b6d84696e3bb725ccc88b4c616238f14fa208decb3bd78fae750",
     "shortcuts": [
         [
             "PDFPatcher.exe",
@@ -12,7 +12,15 @@
         ]
     ],
     "checkver": {
-        "url": "https://www.cnblogs.com/pdfpatcher/",
-        "regex": " (?<version>[\\d.]+) "
+        "script": [
+            "$release = Invoke-RestMethod 'https://api.github.com/repos/wmjordan/PDFPatcher/releases/latest'",
+            "$tag = $release.tag_name -replace '^v', ''",
+            "$name = ($release.assets | Where-Object { $_.name -like 'PDFPatcher.*.7z' } | Select-Object -First 1).name",
+            "\"$tag $name\""
+        ],
+        "regex": "(?<tag>[\\d.]+) PDFPatcher\\.(?<version>[\\d.]+)\\.7z"
+    },
+    "autoupdate": {
+        "url": "https://github.com/wmjordan/PDFPatcher/releases/download/v$matchTag/PDFPatcher.$version.7z"
     }
 }
