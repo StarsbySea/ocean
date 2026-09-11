@@ -1,0 +1,28 @@
+name: Temporary CAJViewer Probe
+
+on:
+  push:
+    branches:
+      - fix-cajviewer-updates
+    paths:
+      - .github/workflows/tmp-cajviewer-probe.yml
+
+jobs:
+  probe:
+    runs-on: windows-latest
+    steps:
+      - name: Probe official CAJViewer installers
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $files = @(
+            @{ Name = 'x64'; Url = 'https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'; Path = 'caj-x64.exe' },
+            @{ Name = 'x86'; Url = 'https://cajviewer.oversea.cnki.net/down/CAJViewer8.0.1.1-setup.exe'; Path = 'caj-x86.exe' }
+          )
+          foreach ($f in $files) {
+            Invoke-WebRequest -Uri $f.Url -OutFile $f.Path -UseBasicParsing
+            $hash = (Get-FileHash $f.Path -Algorithm SHA256).Hash.ToLowerInvariant()
+            $info = [System.Diagnostics.FileVersionInfo]::GetVersionInfo((Resolve-Path $f.Path))
+            Write-Host "$($f.Name) SHA256=$hash"
+            Write-Host "$($f.Name) FileVersion=$($info.FileVersion) ProductVersion=$($info.ProductVersion) Size=$((Get-Item $f.Path).Length)"
+          }
