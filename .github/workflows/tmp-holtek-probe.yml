@@ -11,17 +11,28 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect HT-IDE3000 release page
+      - name: Inspect Holtek frontend API routes
         shell: bash
         run: |
           set -euo pipefail
-          url='https://www.holtek.com.cn/page/contentDetail?cCode=c060063&cMonth=0&cYear=2026'
-          curl -fL --retry 2 -A 'Mozilla/5.0' "$url" -o page.html
-          echo '--- page size ---'
-          wc -c page.html
-          echo '--- HT-IDE context ---'
-          grep -ni -C 4 'HT-IDE' page.html || true
-          echo '--- candidate download/API strings ---'
-          grep -Eio 'https?://[^"<> ]+|/[^"<> ]*(download|webapi|file|attach)[^"<> ]*' page.html | grep -Ei 'ide|download|webapi|file|attach|holtek' | head -n 200 || true
-          echo '--- script sources ---'
-          grep -Eio '<script[^>]+src="[^"]+' page.html | head -n 100 || true
+          base='https://www.holtek.com.cn/page/'
+          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' "${base}main.d158c34aecaf41c9.js" -o main.js
+          echo '--- bundle size ---'
+          wc -c main.js
+          echo '--- strings around contentDetail / download / file APIs ---'
+          python3 - <<'PY'
+          import re
+          text=open('main.js','r',encoding='utf-8',errors='ignore').read()
+          pats=[r'contentDetail',r'download',r'attach',r'webapi',r'/api/',r'file',r'document']
+          seen=set()
+          for pat in pats:
+              for m in re.finditer(pat,text,re.I):
+                  s=max(0,m.start()-180); e=min(len(text),m.end()+260)
+                  chunk=text[s:e].replace('\\n',' ').replace('\\r',' ')
+                  if chunk not in seen:
+                      seen.add(chunk)
+                      print('\n---',pat,'---')
+                      print(chunk)
+                  if len(seen)>=120:
+                      raise SystemExit
+          PY
