@@ -1,14 +1,14 @@
 {
     "##": "The installer cannot be extracted and used directly. We need the installer to register an add-on in Office or WPS.",
-    "version": "6.3.2.1",
+    "version": "8.1.0.0",
     "description": "iSlide, the all-in-one PowerPoint add-in, creates professional PowerPoint presentations by combining 200,000+ professional PowerPoint templates/diagrams/pictures/icons/vectors.",
     "homepage": "https://www.islide.cc/",
     "license": {
         "identifier": "Proprietary",
         "url": "https://www.islide.cc/user-agreement"
     },
-    "url": "https://api.islide.cc/download/package/exe?version=6.3.2.1#/dl.exe",
-    "hash": "13b05f9c4e9468693005117270796e41a67a4703d35fd4b6ef3ef194830120be",
+    "url": "https://static.islide.cc/site/product/package/exe/2024-09-25/173747/iSlide-8.1.0.0.exe#/dl.exe",
+    "hash": "618b59d26f496e5e545e3c336a41f2e08fac43ac0bd707ebd85bea550e1389b0",
     "installer": {
         "args": [
             "/S",
@@ -32,9 +32,11 @@
         ]
     ],
     "checkver": {
-        "url": "https://github.com/microsoft/winget-pkgs/tree/master/manifests/i/iSlide/iSlide",
-        "regex": "js-navigation-open Link--primary\" title=\"([\\d.]+)",
-        "reverse": true
+        "script": [
+            "$versions = Invoke-RestMethod 'https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/i/iSlide/iSlide'",
+            "($versions.name | ForEach-Object { [version]$_ } | Sort-Object -Descending | Select-Object -First 1).ToString()"
+        ],
+        "regex": "([\\d.]+)"
     },
     "autoupdate": {
         "url": "https://api.islide.cc/download/package/exe?version=$version#/dl.exe"
