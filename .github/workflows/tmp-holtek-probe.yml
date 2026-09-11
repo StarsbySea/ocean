@@ -11,31 +11,27 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Inspect Holtek root frontend API routes
+      - name: Extract Holtek API configuration
         shell: bash
         run: |
           set -euo pipefail
-          url='https://www.holtek.com.cn/main.d158c34aecaf41c9.js'
-          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' -D headers.txt "$url" -o main.js
-          echo '--- response headers ---'
-          grep -Ei '^(HTTP/|content-type:|content-length:)' headers.txt || true
-          echo '--- bundle size/prefix ---'
-          wc -c main.js
-          head -c 120 main.js; echo
-          echo '--- strings around contentDetail / download / file APIs ---'
+          curl -fL --max-time 30 --retry 2 -A 'Mozilla/5.0' 'https://www.holtek.com.cn/main.d158c34aecaf41c9.js' -o main.js
           python3 - <<'PY'
           import re
           text=open('main.js','r',encoding='utf-8',errors='ignore').read()
-          pats=[r'contentDetail',r'download',r'attach',r'webapi',r'/api/',r'file',r'document',r'contentList']
-          seen=set()
-          for pat in pats:
-              for m in re.finditer(pat,text,re.I):
-                  s=max(0,m.start()-220); e=min(len(text),m.end()+340)
-                  chunk=text[s:e].replace('\\n',' ').replace('\\r',' ')
-                  if chunk not in seen:
-                      seen.add(chunk)
-                      print('\n---',pat,'---')
-                      print(chunk)
-                  if len(seen)>=100:
-                      raise SystemExit
+          for pat in [r'apiUrl', r'contentDetail', r'GetContent', r'ContentDetail', r'cCode', r'CCode', r'AttachFile', r'CPath', r'CFileName']:
+              print(f'\n===== {pat} =====')
+              matches=list(re.finditer(pat,text,re.I))
+              print('count=',len(matches))
+              for m in matches[:12]:
+                  s=max(0,m.start()-260); e=min(len(text),m.end()+420)
+                  print(text[s:e].replace('\\n',' ').replace('\\r',' '))
+          print('\n===== URL-like string literals =====')
+          vals=[]
+          for q,v in re.findall(r'([\"\'])(.{1,220}?)\1', text):
+              lv=v.lower()
+              if any(k in lv for k in ('api','content','attach','download','file')) and ('/' in v or 'http' in lv):
+                  if v not in vals:
+                      vals.append(v)
+          for v in vals[:200]: print(v)
           PY
