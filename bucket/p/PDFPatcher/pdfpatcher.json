@@ -12,9 +12,13 @@
         ]
     ],
     "checkver": {
-        "github": "https://api.github.com/repos/wmjordan/PDFPatcher/releases/latest",
-        "jsonpath": "$.assets[*].browser_download_url",
-        "regex": "download/v(?<tag>[\\d.]+)/PDFPatcher\\.(?<version>[\\d.]+)\\.7z"
+        "script": [
+            "$release = Invoke-RestMethod 'https://api.github.com/repos/wmjordan/PDFPatcher/releases/latest'",
+            "$tag = $release.tag_name -replace '^v', ''",
+            "$asset = $release.assets | Where-Object { $_.name -match '^PDFPatcher\\.[\\d.]+\\.7z$' } | Select-Object -First 1",
+            "if ($asset.name -match '^PDFPatcher\\.(?<version>[\\d.]+)\\.7z$') { \"$tag $($Matches['version'])\" }"
+        ],
+        "regex": "(?<tag>[\\d.]+) (?<version>[\\d.]+)"
     },
     "autoupdate": {
         "url": "https://github.com/wmjordan/PDFPatcher/releases/download/v$matchTag/PDFPatcher.$version.7z"
