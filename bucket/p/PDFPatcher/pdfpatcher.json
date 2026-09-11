@@ -12,7 +12,10 @@
         ]
     ],
     "checkver": {
-        "url": "https://www.cnblogs.com/pdfpatcher/",
-        "regex": " (?<version>[\\d.]+) "
+        "url": "https://api.github.com/repos/wmjordan/PDFPatcher/releases/latest",
+        "regex": "\\\"tag_name\\\":\\\"v(?<tag>[\\d.]+)\\\".*?\\\"name\\\":\\\"PDFPatcher\\.(?<version>[\\d.]+)\\.7z\\\""
+    },
+    "autoupdate": {
+        "url": "https://github.com/wmjordan/PDFPatcher/releases/download/v$matchTag/PDFPatcher.$version.7z"
     }
 }
