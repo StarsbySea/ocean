@@ -38,13 +38,8 @@
     },
     "checkver": {
         "script": [
-            "# Please keep this script. Using 'cdn-go.cn' may result in receiving expired cache responses.",
-            "$url = 'https://cdn-go.cn/qq-web/im.qq.com_new/latest/rainbow/windowsConfig.js'",
-            "$hostname = ([Uri]$url).Host",
-            "$records = Resolve-DnsName 'cdn-go.cn.cloud.tc.qq.com' -Type A -DnsOnly -ErrorAction Ignore",
-            "$ip = $records | Where-Object { $_.QueryType -eq 'A' -and $_.IPAddress } | Select-Object -ExpandProperty IP4Address -First 1",
-            "$url = $url -Replace [regex]::Escape($hostname), $ip",
-            "Invoke-WebRequest -Uri $url -UseBasicParsing -Headers @{'Host' = $hostname} | Select-Object -ExpandProperty Content"
+            "$release = Invoke-RestMethod 'https://api.github.com/repos/Rodert/qq-versions/releases/latest'",
+            "$release.body"
         ],
         "regex": "QQNT/(.*?)/QQ_([\\d.]+)_([\\d]+)_x86_01.exe",
         "replace": "${2}.${3}"
