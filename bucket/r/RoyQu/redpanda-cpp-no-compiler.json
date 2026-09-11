@@ -1,19 +1,19 @@
 {
-    "version": "2.22",
+    "version": "3.4",
     "description": "A light-weight C/C++ IDE based on Qt.",
-    "homepage": "https://sourceforge.net/projects/redpanda-cpp",
+    "homepage": "https://github.com/royqh1979/RedPanda-CPP",
     "license": {
         "identifier": "GPL-3.0",
         "url": "https://github.com/royqh1979/RedPanda-CPP/blob/master/LICENSE"
     },
     "architecture": {
         "64bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/v2.22/RedPanda.C%2B%2B.2.22.win64.No.Compiler.Portable.7z",
-            "hash": "sha1:7fbf5109056bcde424500309d52fd18c2c3737c2"
+            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C%2B%2B.3.4.win64.NoCompiler.Portable.7z",
+            "hash": "765db85461a5af0b1350b645dcbbe302a55e27ccfa4ed982636936913e909f8c"
         },
         "32bit": {
-            "url": "https://sourceforge.net/projects/redpanda-cpp/files/v2.22/RedPanda.C%2B%2B.2.22.win32.No.Compiler.Portable.7z",
-            "hash": "sha1:c92c9bd5770265930f248b3a9a160ad63039abed"
+            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C%2B%2B.3.4.win32.NoCompiler.Portable.7z",
+            "hash": "bc17cdf94669c7084013f5ec2af61de7ab97c94b1e7e460d4de047efdd0337d4"
         }
     },
     "extract_dir": "RedPanda-Cpp",
@@ -25,16 +25,17 @@
         ]
     ],
     "checkver": {
-        "url": "https://sourceforge.net/projects/redpanda-cpp/files/",
-        "regex": "RedPanda\\.C(?:%2B%2B|\\+\\+)\\.(?<version>[\\d.]+)\\.win64\\.MinGW64_[\\d.]+\\.Setup\\.exe"
+        "github": "https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest",
+        "jsonpath": "$.tag_name",
+        "regex": "v(?<version>[\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win64.NoCompiler.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win64.NoCompiler.Portable.7z"
             },
             "32bit": {
-                "url": "https://sourceforge.net/projects/redpanda-cpp/files/v$version/RedPanda.C%2B%2B.$version.win32.NoCompiler.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win32.NoCompiler.Portable.7z"
             }
         }
     }
