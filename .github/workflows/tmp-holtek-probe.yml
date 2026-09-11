@@ -1,0 +1,27 @@
+name: Temporary Holtek Probe
+
+on:
+  push:
+    branches:
+      - fix-ht-ide3000-updates
+    paths:
+      - .github/workflows/tmp-holtek-probe.yml
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect HT-IDE3000 release page
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://www.holtek.com.cn/page/contentDetail?cCode=c060063&cMonth=0&cYear=2026'
+          curl -fL --retry 2 -A 'Mozilla/5.0' "$url" -o page.html
+          echo '--- page size ---'
+          wc -c page.html
+          echo '--- HT-IDE context ---'
+          grep -ni -C 4 'HT-IDE' page.html || true
+          echo '--- candidate download/API strings ---'
+          grep -Eio 'https?://[^"<> ]+|/[^"<> ]*(download|webapi|file|attach)[^"<> ]*' page.html | grep -Ei 'ide|download|webapi|file|attach|holtek' | head -n 200 || true
+          echo '--- script sources ---'
+          grep -Eio '<script[^>]+src="[^"]+' page.html | head -n 100 || true
