@@ -25,9 +25,13 @@
         ]
     ],
     "checkver": {
-        "github": "https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest",
-        "jsonpath": "$.tag_name",
-        "regex": "v(?<version>[\\d.]+)"
+        "script": [
+            "$release = Invoke-RestMethod 'https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest'",
+            "$version = $release.tag_name -replace '^v', ''",
+            "$asset = $release.assets | Where-Object { $_.name -eq \"RedPanda.C++.$version.win64.NoCompiler.Portable.7z\" } | Select-Object -First 1",
+            "if ($asset) { $version }"
+        ],
+        "regex": "(?<version>[\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
