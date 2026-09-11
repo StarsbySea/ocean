@@ -13,7 +13,7 @@
     ],
     "checkver": {
         "url": "https://api.github.com/repos/wmjordan/PDFPatcher/releases/latest",
-        "regex": "\"tag_name\"\\s*:\\s*\"v(?<tag>[\\d.]+)\"[\\s\\S]*?\"name\"\\s*:\\s*\"PDFPatcher\\.(?<version>[\\d.]+)\\.7z\""
+        "regex": "browser_download_url\\\"\\s*:\\s*\\\"https://github\\.com/wmjordan/PDFPatcher/releases/download/v(?<tag>[\\d.]+)/PDFPatcher\\.(?<version>[\\d.]+)\\.7z"
     },
     "autoupdate": {
         "url": "https://github.com/wmjordan/PDFPatcher/releases/download/v$matchTag/PDFPatcher.$version.7z"
