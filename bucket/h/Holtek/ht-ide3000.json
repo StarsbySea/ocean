@@ -38,8 +38,8 @@
         "script": [
             "$body = @{ Keyword = 'HT-IDE3000'; CLanguageType = 3; Category = 'News'; SubCategory = 'Tools News'; PageIndex = 1; PageSize = 200 } | ConvertTo-Json",
             "$items = (Invoke-RestMethod -Method Post -Uri 'https://www.holtek.com.cn/webapi/api/Page/GetSearchResult' -ContentType 'application/json' -Body $body).Entries.SearchList",
-            "$versions = $items | ForEach-Object { if ($_.Title -match '^HT-IDE3000\\s*V(?<version>[\\d.]+)\\s+Release') { [version]$matches.version } } | Sort-Object -Descending",
-            "$versions[0].ToString()"
+            "$versions = $items | ForEach-Object { if ($_.Title -match '^HT-IDE3000\\s*V(?<version>[\\d.]+)\\s+Release') { $raw = $matches.version; $parts = $raw.Split('.'); $sort = if ($parts.Count -eq 2 -and $parts[0] -eq '8' -and $parts[1] -match '^0\\d$') { [version](\"8.0.$([int]$parts[1])\") } else { [version]$raw }; [pscustomobject]@{ Raw = $raw; Sort = $sort } } } | Sort-Object Sort -Descending",
+            "$versions[0].Raw"
         ],
         "regex": "([\\d.]+)"
     },
