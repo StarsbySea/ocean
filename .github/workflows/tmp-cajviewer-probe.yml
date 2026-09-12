@@ -11,28 +11,64 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe updater metadata and range support
+      - name: Parallel-download official CAJViewer installers
         shell: bash
         run: |
-          set -u
-          echo '=== updater metadata candidates ==='
-          candidates=(
-            'https://cajviewer.oversea.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
-            'https://cajviewer.oversea.cnki.net/down/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
-            'https://cajviewer.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
-            'https://download.cnki.net/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
-          )
-          for u in "${candidates[@]}"; do
-            echo "--- $u"
-            curl -k -L --max-time 20 -A 'Mozilla/5.0' -sS -D headers.txt "$u" -o body.txt
-            rc=$?
-            grep -Ei '^(HTTP/|content-type:|content-length:|location:)' headers.txt || true
-            echo "curl_rc=$rc bytes=$(wc -c < body.txt 2>/dev/null || echo 0)"
-            head -c 800 body.txt 2>/dev/null || true; echo
-          done
-          echo '=== x64 range probe ==='
-          u='https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe'
-          curl -k -L --max-time 30 -A 'Mozilla/5.0' -r 0-1048575 -D range-headers.txt "$u" -o range.bin
-          rc=$?
-          grep -Ei '^(HTTP/|content-range:|accept-ranges:|content-length:)' range-headers.txt || true
-          echo "range_rc=$rc bytes=$(wc -c < range.bin 2>/dev/null || echo 0)"
+          set -euo pipefail
+          python3 - <<'PY'
+          import urllib.request, concurrent.futures, hashlib, os, re
+
+          UA='Mozilla/5.0'
+          urls={
+            'x64':'https://cajviewer.oversea.cnki.net/down/CAJViewer%208.1_x64-setup.exe',
+            'x86':'https://cajviewer.oversea.cnki.net/down/CAJViewer8.0.1.1-setup.exe'
+          }
+
+          def size_of(url):
+            req=urllib.request.Request(url,headers={'User-Agent':UA},method='HEAD')
+            with urllib.request.urlopen(req,timeout=60) as r:
+              return int(r.headers['Content-Length']), dict(r.headers)
+
+          def download(name,url):
+            size,headers=size_of(url)
+            print(f'{name}: size={size} last-modified={headers.get("Last-Modified")} etag={headers.get("ETag")}')
+            workers=16
+            chunk=(size + workers - 1)//workers
+            ranges=[]
+            for i in range(workers):
+              start=i*chunk
+              if start>=size: break
+              end=min(size-1,(i+1)*chunk-1)
+              ranges.append((i,start,end))
+            def get_part(t):
+              i,start,end=t
+              req=urllib.request.Request(url,headers={'User-Agent':UA,'Range':f'bytes={start}-{end}'})
+              with urllib.request.urlopen(req,timeout=300) as r:
+                data=r.read()
+                cr=r.headers.get('Content-Range')
+                if len(data)!=(end-start+1):
+                  raise RuntimeError(f'{name} part {i} expected {end-start+1}, got {len(data)} range={cr}')
+                print(f'{name}: part {i} {start}-{end} ok')
+                return i,data
+            parts=[None]*len(ranges)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+              for i,data in ex.map(get_part,ranges): parts[i]=data
+            out=f'{name}.exe'
+            h=hashlib.sha256()
+            total=0
+            with open(out,'wb') as f:
+              for data in parts:
+                f.write(data); h.update(data); total+=len(data)
+            if total!=size: raise RuntimeError(f'{name} assembled {total} != {size}')
+            print(f'{name}: sha256={h.hexdigest()} size={total}')
+
+          for name,url in urls.items():
+            download(name,url)
+
+          xml='https://cajviewer.oversea.cnki.net/down/CAJUpgrade/CAJIncrementalUpdate/x64/CurrentVersion.xml'
+          req=urllib.request.Request(xml,headers={'User-Agent':UA})
+          with urllib.request.urlopen(req,timeout=60) as r:
+            text=r.read().decode('utf-8','replace')
+          m=re.search(r'<root\s+version="([\d.]+)"',text)
+          print('CurrentVersion=',m.group(1) if m else 'NO MATCH')
+          PY
