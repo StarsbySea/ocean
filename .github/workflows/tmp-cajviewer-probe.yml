@@ -16,7 +16,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import urllib.request, concurrent.futures, hashlib, os, re
+          import urllib.request, concurrent.futures, hashlib, os, re, subprocess
 
           UA='Mozilla/5.0'
           urls={
@@ -42,23 +42,27 @@ jobs:
               ranges.append((i,start,end))
             def get_part(t):
               i,start,end=t
-              req=urllib.request.Request(url,headers={'User-Agent':UA,'Range':f'bytes={start}-{end}'})
-              with urllib.request.urlopen(req,timeout=300) as r:
-                data=r.read()
-                cr=r.headers.get('Content-Range')
-                if len(data)!=(end-start+1):
-                  raise RuntimeError(f'{name} part {i} expected {end-start+1}, got {len(data)} range={cr}')
-                print(f'{name}: part {i} {start}-{end} ok')
-                return i,data
+              path=f'{name}.part.{i:02d}'
+              cmd=['curl','-k','-fsSL','--retry','6','--retry-all-errors','--retry-delay','1','--connect-timeout','30','--max-time','240','-A',UA,'-r',f'{start}-{end}',url,'-o',path]
+              subprocess.run(cmd,check=True)
+              actual=os.path.getsize(path)
+              expected=end-start+1
+              if actual!=expected:
+                raise RuntimeError(f'{name} part {i} expected {expected}, got {actual}')
+              print(f'{name}: part {i} {start}-{end} ok')
+              return i,path
             parts=[None]*len(ranges)
             with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-              for i,data in ex.map(get_part,ranges): parts[i]=data
-            out=f'{name}.exe'
-            h=hashlib.sha256()
-            total=0
-            with open(out,'wb') as f:
-              for data in parts:
-                f.write(data); h.update(data); total+=len(data)
+              futures=[ex.submit(get_part,t) for t in ranges]
+              for fut in concurrent.futures.as_completed(futures):
+                i,path=fut.result(); parts[i]=path
+            h=hashlib.sha256(); total=0
+            for path in parts:
+              with open(path,'rb') as f:
+                while True:
+                  b=f.read(1024*1024)
+                  if not b: break
+                  h.update(b); total+=len(b)
             if total!=size: raise RuntimeError(f'{name} assembled {total} != {size}')
             print(f'{name}: sha256={h.hexdigest()} size={total}')
 
