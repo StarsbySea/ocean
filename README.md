@@ -1,6 +1,6 @@
 # Scoop ocean Bucket
 
-[![App Manifests](https://img.shields.io/badge/App%20Manifests-27-informational)](https://github.com/StarsbySea/ocean/tree/main/bucket) [![GitHub stars](https://img.shields.io/github/stars/StarsbySea/ocean)](https://github.com/StarsbySea/ocean/stargazers) [![Tests](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml) [![Excavator](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml)
+[![App Manifests](https://img.shields.io/badge/App%20Manifests-26-informational)](https://github.com/StarsbySea/ocean/tree/main/bucket) [![GitHub stars](https://img.shields.io/github/stars/StarsbySea/ocean)](https://github.com/StarsbySea/ocean/stargazers) [![Tests](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/ci.yml) [![Excavator](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml/badge.svg)](https://github.com/StarsbySea/ocean/actions/workflows/excavator.yml)
 
 A bucket designed to collect niche but useful software.
 
@@ -26,7 +26,6 @@ for a list of applications in this bucket with descriptions.
 | cloudflare-speedtest | Test Cloudflare CDN latency and speed, get the fastest IP (IPv4+IPv6)!                                            | `scoop install ocean/cloudflare-speedtest`                                                     |
 | Cloudflare WARP      | The Cloudflare WARP client is a fast and modern VPN.                                                              | `scoop install ocean/cloudflare-warp`                                                          |
 | Geph                 | Geph is a modular Internet censorship circumvention system designed specifically to deal with national filtering. | `scoop install ocean/geph-cli` <br> `scoop install ocean/geph-gui`                             |
-| GhosTCP              | GhosTCP is a program for Windows that protects the TCP connections from being interfered.                         | `scoop install ocean/ghostcp`                                                                  |
 | HT-IDE3000           | The HT-IDE3000 is an integrated development environment for designing 8-bit MCU applications.                     | `scoop install ocean/ht-ide3000`                                                               |
 | Kiwix Desktop        | The Kiwix Desktop is a viewer/manager of ZIM files for GNU/Linux and Microsoft Windows OSes.                      | `scoop install ocean/kiwix-desktop`                                                            |
 | Lyricify             | A fantastic app to provide auto-scrolling lyrics for Spotify, iTunes and more.                                    | `scoop install ocean/lyricify`                                                                 |
