@@ -15,7 +15,6 @@
         "82138ddaac7e039e5ed99ebc270945a0c4eaa0ea73ccb184c19395a618a46450",
         "324f934848adf195272eb33bc6ba2454bc352a1e668d4b8df47595b719623251",
         "f234d6d426815b387326b3dab0647c804ea1eda5401dca4985b693e059c3c767"
-
     ],
     "installer": {
         "script": "Expand-InnoArchive \"$dir\\dl.exe\" -Destination \"$dir\" -Removal"
@@ -31,11 +30,8 @@
             "Packet Tracer"
         ]
     ],
-    "checkver": {
-        "url": "https://www.computernetworkingnotes.com/ccna-study-guide/download-packet-tracer-for-windows-and-linux.html",
-        "regex": "href=\"(?<link>.+?)\".+Tracer (?<version>\\d+.\\d+.\\d+)"
-    },
     "notes": [
-        "The requirement to log in has been bypassed."
+        "The requirement to log in has been bypassed.",
+        "Automatic update checks are disabled because current Cisco Packet Tracer downloads are distributed through NetAcad/Skills for All rather than a stable unauthenticated package URL."
     ]
 }
