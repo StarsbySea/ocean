@@ -1,10 +1,10 @@
 {
-    "version": "8.15",
+    "version": "8.3.4",
     "description": "The HT-IDE3000 is an integrated development environment for designing 8-bit MCU applications.",
-    "homepage": "https://www.bing.com/search?q=%22https%3A%2F%2Fwww.holtek.com%22",
+    "homepage": "https://www.holtek.com/",
     "license": "Freeware",
-    "url": "https://www.holtek.com/documents/10179/108746/HT-IDE3KV815_Setup.zip#/dl.zip",
-    "hash": "ee925ecf8fbc6f5bddf544c2dc88cbfedd7a237fb7f2f9c9fa19a8d795926685",
+    "url": "https://www.holtek.com.cn/WebAPI/9f0f1311-eed7-4825-8cb9-37531bde38f7#/dl.zip",
+    "hash": "b5f58cf37f85ec98261082510e56cde4e8fa7774b7707a8d90196c4d5e3b1b7c",
     "installer": {
         "script": "Get-Item \"$dir\\HT-IDE3K*Setup.exe\" | Expand-InnoArchive -Destination \"$dir\" -Removal"
     },
@@ -36,17 +36,15 @@
     ],
     "checkver": {
         "script": [
-            "$headers = New-Object \"System.Collections.Generic.Dictionary[[String],[String]]\"",
-            "$headers.Add(\"User-Agent\", \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0\")",
-            "$headers.Add(\"Cookie\", \"JSESSIONID=A086EE0BD0F5985F8691B4946214C383; COOKIE_SUPPORT=true; GUEST_LANGUAGE_ID=en\")",
-            "$cont = $(Invoke-WebRequest -Uri \"https://www.holtek.com/ice\" -Headers $headers).Content",
-            "Write-Output $cont"
+            "$body = @{ Keyword = 'HT-IDE3000'; CLanguageType = 3; Category = 'News'; SubCategory = 'Tools News'; PageIndex = 1; PageSize = 200 } | ConvertTo-Json",
+            "$items = (Invoke-RestMethod -Method Post -Uri 'https://www.holtek.com.cn/webapi/api/Page/GetSearchResult' -ContentType 'application/json' -Body $body).Entries.SearchList",
+            "$versions = $items | ForEach-Object { if ($_.Title -match '^HT-IDE3000\\s*V(?<version>[\\d.]+)\\s+Release') { $raw = $matches.version; $parts = $raw.Split('.'); $sort = if ($parts.Count -eq 2 -and $parts[0] -eq '8' -and $parts[1] -match '^0\\d$') { [version](\"8.0.$([int]$parts[1])\") } else { [version]$raw }; [pscustomobject]@{ Raw = $raw; Sort = $sort } } } | Sort-Object Sort -Descending",
+            "$versions[0].Raw"
         ],
-        "regex": "documents/(?<path1>[\\w]+)/(?<path2>[\\w]+)/HT-IDE3KV([\\d])([\\d]+)_Setup.zip/9f0f1311-eed7-4825-8cb9-37531bde38f7",
-        "replace": "${1}.${2}"
+        "regex": "([\\d.]+)"
     },
     "autoupdate": {
-        "url": "https://www.holtek.com/documents/$matchPath1/$matchPath2/HT-IDE3KV$cleanVersion_Setup.zip#/dl.zip"
+        "url": "https://www.holtek.com.cn/WebAPI/9f0f1311-eed7-4825-8cb9-37531bde38f7#/dl.zip"
     },
     "notes": [
         "You will need to install the device drivers manually, they are available at:",
