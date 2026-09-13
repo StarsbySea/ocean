@@ -1,5 +1,5 @@
 {
-    "version": "5.8.4",
+    "version": "5.9.0",
     "description": "Geph is a modular Internet censorship circumvention system designed specifically to deal with national filtering. ",
     "homepage": "https://geph.io/",
     "license": {
@@ -7,8 +7,8 @@
         "url": "https://github.com/geph-official/geph4-client/blob/master/LICENSE.md"
     },
     "notes": "If the GUI does not work properly, you may install Microsoft Edge WebView2 Runtime ($dir\\MicrosoftEdgeWebview2Setup.exe) manually.",
-    "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/5.8.4/geph-windows-setup.exe",
-    "hash": "8d1333d71cc16375fcc2a2da2d55c1c901a2436c59afc247f34a77826a18406d",
+    "url": "https://f001.backblazeb2.com/file/geph4-dl/geph-releases/windows-stable/5.9.0/geph-windows-setup.exe",
+    "hash": "4d29a91596474793bb1e14fd1910ba162d8e7c52727fc75af39ff9ef650f629f",
     "innosetup": true,
     "uninstaller": {
         "script": [
