@@ -31,7 +31,9 @@
     ],
     "checkver": {
         "script": [
-            "$versions = Invoke-RestMethod 'https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/i/iSlide/iSlide'",
+            "$headers = @{ 'User-Agent' = 'Scoop-Checkver' }",
+            "if ($env:GITHUB_TOKEN) { $headers['Authorization'] = \"Bearer $env:GITHUB_TOKEN\" }",
+            "$versions = Invoke-RestMethod -Uri 'https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/i/iSlide/iSlide' -Headers $headers -ErrorAction Stop",
             "($versions.name | ForEach-Object { [version]$_ } | Sort-Object -Descending | Select-Object -First 1).ToString()"
         ],
         "regex": "([\\d.]+)"

@@ -25,7 +25,9 @@
     },
     "checkver": {
         "script": [
-            "$releases = Invoke-RestMethod 'https://api.github.com/repos/cloudflare/cloudflare-docs/contents/src/content/warp-releases/windows/ga'",
+            "$headers = @{ 'User-Agent' = 'Scoop-Checkver' }",
+            "if ($env:GITHUB_TOKEN) { $headers['Authorization'] = \"Bearer $env:GITHUB_TOKEN\" }",
+            "$releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/cloudflare/cloudflare-docs/contents/src/content/warp-releases/windows/ga' -Headers $headers -ErrorAction Stop",
             "($releases.name -replace '\\.yaml$' | ForEach-Object { [version]$_ } | Sort-Object -Descending | Select-Object -First 1).ToString()"
         ],
         "regex": "([\\d.]+)"

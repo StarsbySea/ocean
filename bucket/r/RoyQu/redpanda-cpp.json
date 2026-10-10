@@ -26,7 +26,9 @@
     ],
     "checkver": {
         "script": [
-            "$release = Invoke-RestMethod 'https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest'",
+            "$headers = @{ 'User-Agent' = 'Scoop-Checkver' }",
+            "if ($env:GITHUB_TOKEN) { $headers['Authorization'] = \"Bearer $env:GITHUB_TOKEN\" }",
+            "$release = Invoke-RestMethod -Uri 'https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest' -Headers $headers -ErrorAction Stop",
             "$version = $release.tag_name -replace '^v', ''",
             "$names = $release.assets.name -join \"`n\"",
             "$gcc64 = [regex]::Match($names, \"RedPanda\\.C\\+\\+\\.$([regex]::Escape($version))\\.win64\\.MinGW64_(?<gcc>[\\d.]+)\\.Portable\\.7z\").Groups['gcc'].Value",
