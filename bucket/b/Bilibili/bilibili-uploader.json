@@ -1,0 +1,33 @@
+{
+    "version": "2.3.0.1089",
+    "description": "Bilibili Upload Tool. (Video Compression and Multi-P Upload)",
+    "homepage": "https://member.bilibili.com/platform/upload/video/frame",
+    "depends": "main/innoextract",
+    "license": {
+        "identifier": "Freeware"
+    },
+    "url": "https://dl.hdslb.com/bili/bililive/win/bilibiliuploader-2.3.0.1089.exe#/dl.exe",
+    "hash": "7172a573b3bee6de7b7c875d203932096df75d92080ae0305fc23ee9c1eb234e",
+    "pre_install": [
+        "New-Item \"$dir\\extract\" -ItemType Directory | Out-Null",
+        "Invoke-ExternalCommand innoextract -ArgumentList @(\"$dir\\dl.exe\",'--output-dir', \"$dir\\extract\",'--silent') | Out-Null",
+        "Move-Item \"$dir\\extract\\app\\*\" \"$dir\\\"",
+        "New-Item -Path \"$dir\" -Name \"bililive_ugc\" -ItemType \"file\" | Out-Null"
+    ],
+    "post_install": [
+        "Remove-Item \"$dir\\dl.exe\", \"$dir\\extract\", \"vcredist_x86\" -Force -Recurse"
+    ],
+    "shortcuts": [
+        [
+            "ugc_assistant.exe",
+            "哔哩哔哩投稿工具"
+        ]
+    ],
+    "checkver": {
+        "url": "https://member.bilibili.com/x/web/index/tool?type=1",
+        "regex": "bilibiliuploader-([\\d.]+).exe"
+    },
+    "autoupdate": {
+        "url": "https://dl.hdslb.com/bili/bililive/win/bilibiliuploader-$version.exe#/dl.exe"
+    }
+}
