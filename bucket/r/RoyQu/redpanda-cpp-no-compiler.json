@@ -1,5 +1,5 @@
 {
-    "version": "3.4",
+    "version": "3.5",
     "description": "A light-weight C/C++ IDE based on Qt.",
     "homepage": "https://github.com/royqh1979/RedPanda-CPP",
     "license": {
@@ -8,12 +8,12 @@
     },
     "architecture": {
         "64bit": {
-            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C%2B%2B.3.4.win64.NoCompiler.Portable.7z",
-            "hash": "765db85461a5af0b1350b645dcbbe302a55e27ccfa4ed982636936913e909f8c"
+            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.5/RedPanda.C%2B%2B.3.5.0.win64.NoCompiler.Portable.7z",
+            "hash": "d5b263b191643bae3c0b245991ed58483954a35ddbfe218bdbf79c43404b612e"
         },
         "32bit": {
-            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.4/RedPanda.C%2B%2B.3.4.win32.NoCompiler.Portable.7z",
-            "hash": "bc17cdf94669c7084013f5ec2af61de7ab97c94b1e7e460d4de047efdd0337d4"
+            "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v3.5/RedPanda.C%2B%2B.3.5.0.win32.NoCompiler.Portable.7z",
+            "hash": "90f4246c39e5b2c10120052fba3227986ac2c5b02e8b243e41c5a9c936739e65"
         }
     },
     "extract_dir": "RedPanda-Cpp",
