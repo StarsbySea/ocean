@@ -29,19 +29,19 @@
             "$release = Invoke-RestMethod 'https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest'",
             "$version = $release.tag_name -replace '^v', ''",
             "$names = $release.assets.name -join \"`n\"",
-            "$gcc64 = [regex]::Match($names, \"RedPanda\\.C\\+\\+\\.$([regex]::Escape($version))\\.win64\\.MinGW64_(?<gcc>[\\d.]+)\\.Portable\\.7z\").Groups['gcc'].Value",
-            "$gcc32 = [regex]::Match($names, \"RedPanda\\.C\\+\\+\\.$([regex]::Escape($version))\\.win32\\.MinGW32_(?<gcc>[\\d.]+)\\.Portable\\.7z\").Groups['gcc'].Value",
-            "\"$version $gcc64 $gcc32\""
+            "$win64 = [regex]::Match($names, 'RedPanda\\.C\\+\\+\\.(?<assetversion>[\\d.]+)\\.win64\\.MinGW64_(?<gcc>[\\d.]+)\\.Portable\\.7z')",
+            "$win32 = [regex]::Match($names, 'RedPanda\\.C\\+\\+\\.(?<assetversion>[\\d.]+)\\.win32\\.MinGW32_(?<gcc>[\\d.]+)\\.Portable\\.7z')",
+            "if ($win64.Success -and $win32.Success -and $win64.Groups['assetversion'].Value -eq $win32.Groups['assetversion'].Value) { \"$version $($win64.Groups['assetversion'].Value) $($win64.Groups['gcc'].Value) $($win32.Groups['gcc'].Value)\" }"
         ],
-        "regex": "(?<version>[\\d.]+) (?<gccversion>[\\d.]+) (?<x86gccversion>[\\d.]+)"
+        "regex": "(?<version>[\\d.]+) (?<assetversion>[\\d.]+) (?<gccversion>[\\d.]+) (?<x86gccversion>[\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win64.MinGW64_$matchGccversion.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$matchAssetversion.win64.MinGW64_$matchGccversion.Portable.7z"
             },
             "32bit": {
-                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win32.MinGW32_$matchX86gccversion.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$matchAssetversion.win32.MinGW32_$matchX86gccversion.Portable.7z"
             }
         }
     }
