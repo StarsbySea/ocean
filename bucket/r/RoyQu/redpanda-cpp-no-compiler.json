@@ -28,18 +28,20 @@
         "script": [
             "$release = Invoke-RestMethod 'https://api.github.com/repos/royqh1979/RedPanda-CPP/releases/latest'",
             "$version = $release.tag_name -replace '^v', ''",
-            "$asset = $release.assets | Where-Object { $_.name -eq \"RedPanda.C++.$version.win64.NoCompiler.Portable.7z\" } | Select-Object -First 1",
-            "if ($asset) { $version }"
+            "$names = $release.assets.name -join \"`n\"",
+            "$win64 = [regex]::Match($names, 'RedPanda\\.C\\+\\+\\.(?<assetversion>[\\d.]+)\\.win64\\.NoCompiler\\.Portable\\.7z')",
+            "$win32 = [regex]::Match($names, 'RedPanda\\.C\\+\\+\\.(?<assetversion>[\\d.]+)\\.win32\\.NoCompiler\\.Portable\\.7z')",
+            "if ($win64.Success -and $win32.Success -and $win64.Groups['assetversion'].Value -eq $win32.Groups['assetversion'].Value) { \"$version $($win64.Groups['assetversion'].Value)\" }"
         ],
-        "regex": "(?<version>[\\d.]+)"
+        "regex": "(?<version>[\\d.]+) (?<assetversion>[\\d.]+)"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win64.NoCompiler.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$matchAssetversion.win64.NoCompiler.Portable.7z"
             },
             "32bit": {
-                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$version.win32.NoCompiler.Portable.7z"
+                "url": "https://github.com/royqh1979/RedPanda-CPP/releases/download/v$version/RedPanda.C%2B%2B.$matchAssetversion.win32.NoCompiler.Portable.7z"
             }
         }
     }
