@@ -7,6 +7,10 @@ on:
 permissions: {}
 jobs:
   inner:
+    strategy:
+      fail-fast: false
+      matrix:
+        pid: ['true', 'false']
     runs-on: ubuntu-slim
     timeout-minutes: 8
     steps:
@@ -34,6 +38,8 @@ jobs:
           curl --noproxy '*' -fsS --max-time 15 https://registry.npmjs.org/is-number -o /dev/null
       - name: Verify restricted egress and real wheel download
         shell: bash
+        env:
+          TEST_PID_NAMESPACE: ${{ matrix.pid }}
         run: |
           set -eu
           cd "$HOME/inner-lab"
@@ -47,6 +53,9 @@ jobs:
           cmd = "/usr/bin/python3"
           interactive = false
           TOML
+          sed -i "s/^pid_namespace = true$/pid_namespace = $TEST_PID_NAMESPACE/" "$HOME/.config/inner/profiles/ci-fetch.toml"
+          inner doctor || true
+          inner run -p ci-fetch -w "$PWD" --dry-run -- probe.py
           cat > probe.py <<'PY'
           import os, socket, subprocess, pathlib
           def request(url, *options):
@@ -72,4 +81,4 @@ jobs:
           readlink /proc/self/ns/net | tr -d '\n' > host-netns
           env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy -u NO_PROXY -u no_proxy inner run -p ci-fetch -w "$PWD" -- probe.py
           test -f wheels/idna-3.10-py3-none-any.whl
-          echo 'PASS: restricted dependency fetch' >> "$GITHUB_STEP_SUMMARY"
+          echo "PASS: restricted dependency fetch (diagnostic PID namespace=$TEST_PID_NAMESPACE)" >> "$GITHUB_STEP_SUMMARY"
