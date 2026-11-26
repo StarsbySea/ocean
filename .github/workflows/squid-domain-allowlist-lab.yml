@@ -1,0 +1,127 @@
+name: Squid allowlist isolation lab
+on:
+  push:
+    branches: [experiment/ubuntu-slim-network-isolation]
+    paths: [.github/workflows/squid-domain-allowlist-lab.yml]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-slim
+    timeout-minutes: 8
+    steps:
+      - name: Prepare trusted proxy and tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo -n apt-get update -qq
+          sudo -n apt-get install -y -qq bubblewrap squid socat python3-venv
+          bwrap --version
+          squid -v | head -n 2
+          socat -V | head -n 2
+          lab="$RUNNER_TEMP/squid-lab"
+          mkdir -p "$lab/data" "$lab/relay"
+          python3 -m venv "$lab/data/venv"
+          for url in https://pypi.org/simple/idna/ https://registry.npmjs.org/is-number https://example.com/; do
+            curl --noproxy '*' -fsS --max-time 15 "$url" -o /dev/null
+          done
+      - name: Test private network and PID namespace combinations
+        shell: bash
+        run: |
+          set -eu
+          for mode in net net-pid net-pid-proc net-pid-hidden-proc; do
+            args=(--unshare-net --ro-bind / / --dev /dev)
+            case "$mode" in
+              net-pid) args+=(--unshare-pid);;
+              net-pid-proc) args+=(--unshare-pid --proc /proc);;
+              net-pid-hidden-proc) args+=(--unshare-pid --tmpfs /proc);;
+            esac
+            rc=0
+            bwrap "${args[@]}" -- /bin/true || rc=$?
+            echo "BWRAP_MODE $mode exit=$rc"
+          done
+      - name: Enforce exact domains and HTTPS-only tunnel
+        shell: bash
+        run: |
+          set -euo pipefail
+          lab="$RUNNER_TEMP/squid-lab"
+          cd "$lab"
+          cat > squid.conf <<CONF
+          http_port 127.0.0.1:31281
+          visible_hostname ci-allowlist-lab
+          pid_filename $lab/squid.pid
+          cache_log $lab/cache.log
+          access_log stdio:$lab/access.log
+          cache_store_log none
+          cache deny all
+          cache_mem 8 MB
+          coredump_dir $lab
+          acl tunnel method CONNECT
+          acl tls_port port 443
+          acl allow_host dstdomain -n pypi.org files.pythonhosted.org registry.npmjs.org
+          acl local_dst dst 0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.168.0.0/16 198.18.0.0/15 224.0.0.0/4 240.0.0.0/4 ::/128 ::1/128 fc00::/7 fe80::/10 ff00::/8
+          http_access deny !tunnel
+          http_access deny !tls_port
+          http_access deny !allow_host
+          http_access deny local_dst
+          http_access allow allow_host
+          http_access deny all
+          CONF
+          squid -k parse -f "$lab/squid.conf"
+          squid -N -f "$lab/squid.conf" > "$lab/squid.out" 2>&1 &
+          squid_pid=$!
+          socat UNIX-LISTEN:"$lab/relay/proxy.sock",fork,mode=0600 TCP4:127.0.0.1:31281 > "$lab/relay.log" 2>&1 &
+          relay_pid=$!
+          cleanup() {
+            kill "$relay_pid" "$squid_pid" 2>/dev/null || true
+            cat "$lab/squid.out" "$lab/cache.log" "$lab/access.log" "$lab/relay.log" 2>/dev/null | tail -n 100 || true
+          }
+          trap cleanup EXIT
+          for i in $(seq 1 50); do
+            if test -S "$lab/relay/proxy.sock" && curl -fsS --proxy http://127.0.0.1:31281 --noproxy '' --max-time 3 https://pypi.org/simple/idna/ -o /dev/null; then break; fi
+            sleep .2
+          done
+          curl -fsS --proxy http://127.0.0.1:31281 --noproxy '' --max-time 10 https://pypi.org/simple/idna/ -o /dev/null
+          cat > "$lab/data/probe.py" <<'PY'
+          import os, pathlib, socket, subprocess, sys, time
+          def curl(url, *args):
+              p = subprocess.run(["curl","-fsS","--connect-timeout","4","--max-time","12","-o","/dev/null",*args,url],capture_output=True,text=True)
+              print("PROBE",url,args,p.returncode,p.stderr[:200],flush=True)
+              return p.returncode
+          for _ in range(30):
+              try:
+                  with socket.create_connection(("127.0.0.1",18080),timeout=.2): break
+              except OSError: time.sleep(.1)
+          assert not pathlib.Path("/proc/1/environ").exists(), "host proc visible"
+          assert curl("https://pypi.org/simple/idna/") == 0
+          assert curl("https://registry.npmjs.org/is-number") == 0
+          for url in ("https://example.com/","https://1.1.1.1/","http://pypi.org/","https://pypi.org:444/","https://127.0.0.1/","https://169.254.169.254/"):
+              assert curl(url) != 0, url
+          assert curl("https://pypi.org/simple/idna/","--noproxy","*") != 0
+          with socket.socket() as s:
+              s.settimeout(2)
+              assert s.connect_ex(("1.1.1.1",443)) != 0
+          subprocess.run([sys.executable,"-c","import socket;s=socket.socket();s.settimeout(2);assert s.connect_ex(('1.1.1.1',443))!=0"],check=True)
+          subprocess.run(["venv/bin/python","-m","pip","download","--disable-pip-version-check","--no-cache-dir","--only-binary=:all:","--no-deps","--index-url","https://pypi.org/simple","--dest","wheels","idna==3.10"],check=True)
+          assert pathlib.Path("wheels/idna-3.10-py3-none-any.whl").is_file()
+          print("PASS: exact allowlist, blocked direct network, hidden proc, wheel download",flush=True)
+          PY
+          cat > "$lab/data/run.sh" <<'SH'
+          set -euo pipefail
+          socat TCP4-LISTEN:18080,bind=127.0.0.1,reuseaddr,fork UNIX-CONNECT:/relay/proxy.sock &
+          relay=$!
+          trap 'kill "$relay" 2>/dev/null || true' EXIT
+          python3 probe.py
+          SH
+          bwrap --unshare-user --unshare-net --unshare-pid --die-with-parent \
+            --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/sbin /sbin \
+            --symlink usr/lib /lib --symlink usr/lib64 /lib64 \
+            --ro-bind /etc/ssl /etc/ssl --ro-bind /etc/ld.so.cache /etc/ld.so.cache \
+            --dev /dev --tmpfs /proc --tmpfs /tmp --tmpfs /run \
+            --bind "$lab/data" /work --ro-bind "$lab/relay" /relay --chdir /work \
+            --clearenv --setenv PATH /usr/bin:/bin --setenv HOME /tmp \
+            --setenv https_proxy http://127.0.0.1:18080 --setenv http_proxy http://127.0.0.1:18080 \
+            --setenv HTTPS_PROXY http://127.0.0.1:18080 --setenv HTTP_PROXY http://127.0.0.1:18080 \
+            --setenv PIP_CONFIG_FILE /dev/null -- /bin/bash /work/run.sh
+          test -f "$lab/data/wheels/idna-3.10-py3-none-any.whl"
+          echo 'PASS: Squid CONNECT allowlist, isolated network and PID, real wheel fetch' >> "$GITHUB_STEP_SUMMARY"
