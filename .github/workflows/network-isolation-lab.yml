@@ -1,0 +1,211 @@
+name: Ubuntu slim network isolation lab
+on:
+  push:
+    branches: [experiment/ubuntu-slim-network-isolation]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  isolation:
+    runs-on: ubuntu-slim
+    timeout-minutes: 12
+    steps:
+      - name: Prepare fixed-version tools (network allowed)
+        shell: bash
+        run: |
+          set -u
+          mkdir -p "$RUNNER_TEMP/netlab/bin"
+          cd "$RUNNER_TEMP/netlab"
+          uname -a
+          grep -E 'Cap(Eff|Bnd)|Seccomp|NoNewPrivs' /proc/self/status
+          id
+          for t in python3 curl sudo unshare bwrap iptables nft docker gcc; do command -v "$t" || true; done
+          if command -v sudo >/dev/null && sudo -n true; then
+            sudo -n apt-get update -qq && sudo -n apt-get install -y -qq bubblewrap iptables nftables libseccomp2 python3-venv || echo "APT_SETUP_FAILED"
+          fi
+          curl -fsSL --max-time 60 --retry 2 https://github.com/jdx/mise/releases/download/v2026.11.14/mise-v2026.11.14-linux-x64-musl -o bin/mise &&
+            echo '3b2dbc7011bfd96c4b1160db2bca9f0937f226cc61ae5beddfd1fec536e81b2a  bin/mise' | sha256sum -c - &&
+            chmod +x bin/mise || rm -f bin/mise
+          curl -fsSL --max-time 60 --retry 2 https://github.com/nolabs-ai/nono/releases/download/v0.82.0/nono-v0.82.0-x86_64-unknown-linux-musl.tar.gz -o nono.tar.gz &&
+            echo '2d81384d9025c7ff9c9e29b8f5e83d39cc6739ba37ba8a0c50fe50ceea4653de  nono.tar.gz' | sha256sum -c - &&
+            tar -xzf nono.tar.gz &&
+            find . -type f -name nono -exec cp {} bin/nono \; &&
+            chmod +x bin/nono || rm -f bin/nono
+          python3 -m venv venv && venv/bin/pip install --disable-pip-version-check pytest==8.4.2 pytest-socket==0.7.0 || echo "PYTEST_SETUP_FAILED"
+          if command -v docker >/dev/null && docker info >/dev/null 2>&1; then docker pull python:3.13-slim || true; fi
+          echo "$RUNNER_TEMP/netlab/bin" >> "$GITHUB_PATH"
+      - name: Run isolation experiments
+        shell: bash
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP/netlab"
+          export NONO_NO_UPDATE_CHECK=1 NONO_NO_PACK_UPDATE_HINTS=1 MISE_OFFLINE=1 MISE_EXEC_AUTO_INSTALL=0
+          cat > server.py <<'PY'
+          import socket, threading, time
+          from pathlib import Path
+          tcp = socket.socket(); tcp.bind(("127.0.0.1", 0)); tcp.listen()
+          udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); udp.bind(("127.0.0.1", 0))
+          def tcp_loop():
+              while True:
+                  c, _ = tcp.accept()
+                  with c: c.sendall(b"ok")
+          def udp_loop():
+              while True:
+                  data, address = udp.recvfrom(128)
+                  udp.sendto(data, address)
+          threading.Thread(target=tcp_loop, daemon=True).start()
+          threading.Thread(target=udp_loop, daemon=True).start()
+          Path("ports").write_text(f"{tcp.getsockname()[1]} {udp.getsockname()[1]}")
+          while True: time.sleep(1)
+          PY
+          cat > probe.py <<'PY'
+          import socket, sys, subprocess, pathlib
+          def test(kind, address, payload=None, family=socket.AF_INET):
+              try:
+                  with socket.socket(family, kind) as s:
+                      s.settimeout(2)
+                      if payload:
+                          s.sendto(payload, address); s.recvfrom(128)
+                      else:
+                          s.connect(address)
+                      return "ALLOWED"
+              except OSError as e:
+                  return f"DENIED({type(e).__name__}:{e.errno})"
+          def socket_create(family, kind):
+              try:
+                  with socket.socket(family, kind): return "ALLOWED"
+              except OSError as e: return f"DENIED({e.errno})"
+          ports = list(map(int, pathlib.Path("ports").read_text().split()))
+          checks = {
+              "ipv4_tcp_socket": socket_create(socket.AF_INET, socket.SOCK_STREAM),
+              "ipv4_udp_socket": socket_create(socket.AF_INET, socket.SOCK_DGRAM),
+              "ipv6_tcp_socket": socket_create(socket.AF_INET6, socket.SOCK_STREAM),
+              "ipv6_udp_socket": socket_create(socket.AF_INET6, socket.SOCK_DGRAM),
+              "local_tcp": test(socket.SOCK_STREAM, ("127.0.0.1", ports[0])),
+              "local_udp": test(socket.SOCK_DGRAM, ("127.0.0.1", ports[1]), b"test"),
+              "external_tcp": test(socket.SOCK_STREAM, ("1.1.1.1", 443)),
+              "ipv6_external_tcp": test(socket.SOCK_STREAM, ("2606:4700:4700::1111",443), family=socket.AF_INET6),
+          }
+          print("PROBE", checks, flush=True)
+          if "--child" not in sys.argv and "--baseline" not in sys.argv:
+              child = subprocess.run([sys.executable, __file__, "--child"], check=False)
+              if child.returncode: sys.exit(child.returncode)
+          if "--baseline" in sys.argv:
+              sys.exit(0 if checks["local_tcp"] == checks["local_udp"] == checks["external_tcp"] == "ALLOWED" else 4)
+          sys.exit(0 if all(checks[k] != "ALLOWED" for k in ("local_tcp","local_udp","external_tcp","ipv6_external_tcp")) else 3)
+          PY
+          cat > seccomp.py <<'PY'
+          import ctypes as c, os, sys
+          lib=c.CDLL("libseccomp.so.2", use_errno=True)
+          libc=c.CDLL(None, use_errno=True)
+          lib.seccomp_init.argtypes=[c.c_uint32]; lib.seccomp_init.restype=c.c_void_p
+          lib.seccomp_syscall_resolve_name.argtypes=[c.c_char_p]; lib.seccomp_syscall_resolve_name.restype=c.c_int
+          lib.seccomp_rule_add.argtypes=[c.c_void_p,c.c_uint32,c.c_int,c.c_uint]
+          lib.seccomp_load.argtypes=[c.c_void_p]
+          lib.seccomp_release.argtypes=[c.c_void_p]
+          if libc.prctl(38,1,0,0,0): raise OSError(c.get_errno(),"no_new_privs")
+          ctx=lib.seccomp_init(0x7fff0000)
+          if not ctx: raise RuntimeError("seccomp_init")
+          for name in (b"socket", b"socketpair", b"socketcall", b"io_uring_setup", b"io_uring_enter", b"io_uring_register"):
+              nr=lib.seccomp_syscall_resolve_name(name)
+              if nr>=0 and lib.seccomp_rule_add(ctx,0x00050001,nr,0)!=0: raise RuntimeError(f"rule {name}")
+          if lib.seccomp_load(ctx)!=0: raise RuntimeError("seccomp_load")
+          lib.seccomp_release(ctx)
+          os.execvp(sys.argv[1],sys.argv[1:])
+          PY
+          cat > landlock.py <<'PY'
+          import ctypes as c, os, sys, platform
+          assert platform.machine()=="x86_64"
+          libc=c.CDLL(None,use_errno=True); libc.syscall.restype=c.c_long
+          def call(n,*args):
+              r=libc.syscall(n,*args)
+              if r<0: raise OSError(c.get_errno(), f"syscall {n}")
+              return r
+          abi=call(444,0,0,1)
+          print("Landlock ABI",abi,flush=True)
+          if abi<4: raise RuntimeError("network ABI requires >=4")
+          class Rules(c.Structure):
+              _fields_=[("handled_access_fs",c.c_uint64),("handled_access_net",c.c_uint64)]
+          rules=Rules(0,3)
+          fd=call(444,c.byref(rules),c.sizeof(rules),0)
+          if libc.prctl(38,1,0,0,0): raise OSError(c.get_errno(),"no_new_privs")
+          call(446,fd,0); os.close(fd)
+          os.execvp(sys.argv[1],sys.argv[1:])
+          PY
+          python3 server.py &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do test -s ports && break; sleep .1; done
+          echo "### ubuntu-slim network isolation results" >> "$GITHUB_STEP_SUMMARY"
+          echo '| Method | Probe result |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          result() {
+            local name="$1"; shift
+            echo "::group::$name"
+            set +e
+            timeout 45s "$@" > result.log 2>&1
+            local rc=$?
+            set -e
+            cat result.log
+            if [ "$rc" = 0 ] && grep -q '^PROBE ' result.log; then label='BLOCKED (probe passed)'
+            elif [ "$rc" = 3 ] && grep -q '^PROBE ' result.log; then label='NETWORK AVAILABLE (probe failed)'
+            else label="UNAVAILABLE / ERROR (exit $rc)"; fi
+            printf '| %s | %s |\n' "$name" "$label" >> "$GITHUB_STEP_SUMMARY"
+            echo "::endgroup::"
+          }
+          python3 probe.py --baseline || { echo "Baseline failed; cannot conclude isolation"; exit 1; }
+          result "mise deny-net" mise exec --deny-net -- python3 probe.py
+          result "nono block-net" nono run --allow-cwd --block-net -- /usr/bin/python3 probe.py
+          result "native seccomp" python3 seccomp.py python3 probe.py
+          result "Landlock network only" python3 landlock.py python3 probe.py
+          result "unshare net" unshare --net -- python3 probe.py
+          result "unshare user+net" unshare --user --map-root-user --net -- python3 probe.py
+          result "sudo unshare net" sudo -n unshare --net -- python3 probe.py
+          result "bubblewrap" bwrap --unshare-net --ro-bind / / --dev /dev --proc /proc -- python3 probe.py
+          if command -v docker >/dev/null && docker info >/dev/null 2>&1; then
+            result "Docker network none" docker run --rm --pull=never --network none -v "$PWD:/lab:ro" -w /lab python:3.13-slim python3 probe.py
+          else echo '| Docker network none | Docker daemon unavailable |' >> "$GITHUB_STEP_SUMMARY"; fi
+          for tool in iptables nft; do
+            if [ "$tool" = iptables ]; then args=(-S); else args=(list ruleset); fi
+            if sudo -n "$tool" "${args[@]}"; then
+              echo "| $tool | Read access available; host rules not modified |" >> "$GITHUB_STEP_SUMMARY"
+            else echo "| $tool | Read access unavailable |" >> "$GITHUB_STEP_SUMMARY"; fi
+          done
+          if test -x venv/bin/python; then
+            cat > test_socket.py <<'PY'
+          import subprocess, sys, socket
+          import pytest
+          def test_socket():
+              with pytest.raises(Exception) as exc:
+                  socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+              assert type(exc.value).__name__ == "SocketBlockedError"
+          def test_subprocess_not_isolated():
+              subprocess.run([sys.executable,"-c","import socket; socket.socket().close()"], check=True)
+          PY
+            if venv/bin/python -m pytest -q --disable-socket test_socket.py; then
+              echo '| pytest-socket | Python blocked; subprocess socket still available |' >> "$GITHUB_STEP_SUMMARY"
+            else echo '| pytest-socket | Error or missing plugin |' >> "$GITHUB_STEP_SUMMARY"; fi
+            if PIP_NO_INDEX=1 venv/bin/pip download --no-deps --no-cache-dir -d . netlab-nonexistent-package-abcdef012345; then
+              echo '| pip offline | Unexpected success |' >> "$GITHUB_STEP_SUMMARY"
+            else echo '| pip offline | Package download rejected; general network not isolated |' >> "$GITHUB_STEP_SUMMARY"; fi
+            python3 probe.py --baseline
+          fi
+          cat "$GITHUB_STEP_SUMMARY"
+  harden-runner:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Harden Runner (unsupported-platform comparison)
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
+        continue-on-error: true
+        with:
+          egress-policy: block
+          disable-telemetry: true
+          allowed-endpoints: github.com:443
+      - name: Test outbound connectivity
+        shell: bash
+        run: |
+          if curl --noproxy '*' -fsS --connect-timeout 5 --max-time 10 https://example.com/ -o /dev/null; then
+            echo 'Harden-Runner: non-whitelisted endpoint accessible' | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Harden-Runner: request failed; inspect action logs and baseline before concluding' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
