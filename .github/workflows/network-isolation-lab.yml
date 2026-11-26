@@ -209,3 +209,91 @@ jobs:
           else
             echo 'Harden-Runner: request failed; inspect action logs and baseline before concluding' | tee -a "$GITHUB_STEP_SUMMARY"
           fi
+  compatibility:
+    runs-on: ubuntu-slim
+    timeout-minutes: 8
+    steps:
+      - name: Prepare compatibility tools
+        shell: bash
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/netcompat/bin"
+          cd "$RUNNER_TEMP/netcompat"
+          command -v unshare
+          command -v setpriv
+          unshare --version
+          setpriv --version
+          sudo -n apt-get update -qq && sudo -n apt-get install -y -qq bubblewrap libseccomp2
+          curl -fsSL --max-time 60 --retry 2 https://github.com/jdx/mise/releases/download/v2026.11.14/mise-v2026.11.14-linux-x64-musl -o bin/mise
+          echo '3b2dbc7011bfd96c4b1160db2bca9f0937f226cc61ae5beddfd1fec536e81b2a  bin/mise' | sha256sum -c -
+          chmod +x bin/mise
+          echo "$RUNNER_TEMP/netcompat/bin" >> "$GITHUB_PATH"
+      - name: Compare compatibility and overhead
+        shell: bash
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP/netcompat"
+          export MISE_OFFLINE=1 MISE_EXEC_AUTO_INSTALL=0
+          cat > server.py <<'PY'
+          import socket, threading, time
+          from pathlib import Path
+          tcp = socket.socket(); tcp.bind(("127.0.0.1",0)); tcp.listen()
+          unix = socket.socket(socket.AF_UNIX); unix.bind("test.sock"); unix.listen()
+          def listen(s):
+              while True:
+                  conn, _ = s.accept()
+                  with conn: conn.sendall(b"ok")
+          for s in (tcp,unix): threading.Thread(target=listen,args=(s,),daemon=True).start()
+          Path("port").write_text(str(tcp.getsockname()[1]))
+          while True: time.sleep(1)
+          PY
+          cat > compatibility.py <<'PY'
+          import asyncio, os, socket, subprocess, sys
+          from pathlib import Path
+          def attempt(fn):
+              try: fn(); return "allowed"
+              except OSError as e: return f"denied:{e.errno}"
+              except Exception as e: return type(e).__name__
+          def conn(family,address):
+              with socket.socket(family,socket.SOCK_STREAM) as s:
+                  s.settimeout(2); s.connect(address)
+          def pair():
+              a,b=socket.socketpair(); a.close(); b.close()
+          def aio():
+              async def task(): return 1
+              asyncio.run(task())
+          status=dict(line.split(":",1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)
+          file=Path(f"write-{os.getpid()}"); file.write_text("ok"); file.unlink()
+          print("COMPAT",{"uid":os.getuid(),"gid":os.getgid(),"CapEff":status["CapEff"].strip(),"CapBnd":status["CapBnd"].strip(),"NoNewPrivs":status["NoNewPrivs"].strip(),"netns":os.readlink("/proc/self/ns/net"),"tcp":attempt(lambda:conn(socket.AF_INET,("127.0.0.1",int(Path("port").read_text())))),"external":attempt(lambda:conn(socket.AF_INET,("1.1.1.1",443))),"unix":attempt(lambda:conn(socket.AF_UNIX,"test.sock")),"socketpair":attempt(pair),"asyncio":attempt(aio),"subprocess":attempt(lambda:subprocess.run([sys.executable,"-c","pass"],check=True)),"write":"ok"},flush=True)
+          PY
+          cat > benchmark.py <<'PY'
+          import subprocess, statistics, time, shlex, os
+          methods={
+              "baseline": [],
+              "mise": ["mise","exec","--deny-net","--"],
+              "unshare-root": ["unshare","--user","--map-root-user","--net","--"],
+              "unshare-current": ["unshare","--user","--map-current-user","--net","--"],
+              "unshare-hardened": ["unshare","--user","--map-current-user","--net","--","setpriv","--no-new-privs","--bounding-set=-all","--inh-caps=-all","--ambient-caps=-all","--"],
+              "bubblewrap": ["bwrap","--unshare-net","--bind","/","/","--dev","/dev","--proc","/proc","--"],
+          }
+          for name,cmd in methods.items():
+              print("METHOD",name,shlex.join(cmd),flush=True)
+              p=subprocess.run(cmd+["python3","compatibility.py"],capture_output=True,text=True,timeout=20)
+              print(p.stdout,p.stderr,"EXIT",p.returncode,flush=True)
+              if p.returncode: continue
+              times=[]
+              for _ in range(30):
+                  start=time.perf_counter()
+                  p=subprocess.run(cmd+["/bin/true"],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=10)
+                  if p.returncode: break
+                  times.append((time.perf_counter()-start)*1000)
+              if len(times)==30:
+                  msg=f"{name}: median={statistics.median(times):.2f} ms, max={max(times):.2f} ms (n=30)"
+                  print("BENCH",msg,flush=True)
+                  with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as f: f.write("- "+msg+"\n")
+          PY
+          python3 server.py &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do test -s port && break; sleep .1; done
+          python3 benchmark.py
