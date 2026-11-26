@@ -1,0 +1,45 @@
+name: Offline wrapper acceptance
+on:
+  push:
+    branches: [experiment/ubuntu-slim-network-isolation]
+    paths:
+      - .github/scripts/offline.sh
+      - .github/workflows/offline-wrapper-acceptance.yml
+      - .github/tests/offline_probe.py
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Validate fail-closed wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n .github/scripts/offline.sh
+          runner="$PWD/.github/scripts/offline.sh"
+          bash "$runner" true
+          code=0
+          bash "$runner" || code=$?
+          test "$code" = 64
+          code=0
+          bash "$runner" bash -c 'exit 42' || code=$?
+          test "$code" = 42
+          test "$(bash "$runner" printf '%s' 'space ; $ literal')" = 'space ; $ literal'
+          mkdir -p "$RUNNER_TEMP/offline-shim"
+          printf '#!/bin/sh\nexit 77\n' > "$RUNNER_TEMP/offline-shim/unshare"
+          chmod +x "$RUNNER_TEMP/offline-shim/unshare"
+          marker="$RUNNER_TEMP/offline-executed"
+          code=0
+          PATH="$RUNNER_TEMP/offline-shim:$PATH" bash "$runner" touch "$marker" || code=$?
+          test "$code" = 77
+          test ! -e "$marker"
+          echo 'PASS: syntax, arguments, status propagation and fail-closed behavior' | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Verify live network isolation and compatibility
+        shell: bash
+        run: python3 .github/tests/offline_probe.py
