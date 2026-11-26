@@ -1,0 +1,81 @@
+name: Domain allowlist lab
+on:
+  push:
+    branches: [experiment/ubuntu-slim-network-isolation]
+    paths: [.github/workflows/domain-allowlist-lab.yml]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  srt:
+    runs-on: ubuntu-slim
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Bootstrap sandbox dependencies
+        shell: bash
+        run: |
+          set -eu
+          sudo -n apt-get update -qq
+          sudo -n apt-get install -y -qq bubblewrap socat ripgrep
+          npm install --global --ignore-scripts --no-audit --no-fund @anthropic-ai/sandbox-runtime@0.0.83
+          srt --help
+          curl --noproxy '*' -fsS --max-time 15 https://pypi.org/simple/idna/ -o /dev/null
+          curl --noproxy '*' -fsS --max-time 15 https://example.com/ -o /dev/null
+      - name: Test domain allowlist with independent positive controls
+        shell: bash
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP"
+          mkdir -p allowlist-lab
+          cd allowlist-lab
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          config = {
+              "network": {"allowedDomains":["pypi.org:443","files.pythonhosted.org:443","registry.npmjs.org:443"],"deniedDomains":[]},
+              "filesystem": {"denyRead":["~/.ssh"],"allowWrite":[".","/tmp"],"denyWrite":[]},
+              "enableWeakerNestedSandbox":False,
+              "allowNestedUserNamespaces":False,
+              "enableWeakerNetworkIsolation":False
+          }
+          Path("settings.json").write_text(json.dumps(config))
+          PY
+          cat > probe.py <<'PY'
+          import os, socket, subprocess, sys
+          from pathlib import Path
+          def curl(url, extra=()):
+              p=subprocess.run(["curl","-fsS","--connect-timeout","5","--max-time","15","-o","/dev/null",*extra,url],text=True,capture_output=True)
+              print("CURL",url,extra,p.returncode,p.stderr[:400],flush=True)
+              return p.returncode
+          assert curl("https://pypi.org/simple/idna/") == 0
+          assert curl("https://registry.npmjs.org/is-number") == 0
+          assert curl("https://example.com/") != 0
+          assert curl("https://1.1.1.1/") != 0
+          assert curl("https://pypi.org/simple/idna/",("--noproxy","*")) != 0
+          with socket.socket() as s:
+              s.settimeout(3)
+              try: s.connect(("1.1.1.1",443))
+              except OSError as e: print("DIRECT TCP blocked",repr(e))
+              else: raise AssertionError("direct TCP allowed")
+          child=subprocess.run([sys.executable,"-c","import socket; s=socket.socket(); s.settimeout(2); assert s.connect_ex(('1.1.1.1',443)) != 0"],check=True)
+          try:
+              s=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+          except OSError as e: print("UNIX socket creation",repr(e))
+          else: s.close(); print("UNIX socket creation permitted")
+          p=subprocess.run(["unshare","--user","--map-current-user","--","true"],capture_output=True,text=True)
+          print("NESTED USERNS",p.returncode,p.stderr)
+          print("PASS: allowlisted hosts accessible and non-allowlisted/direct connections blocked")
+          PY
+          env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy -u NO_PROXY -u no_proxy srt --settings "$PWD/settings.json" python3 probe.py
+          echo 'PASS: SRT domain allowlist checks' >> "$GITHUB_STEP_SUMMARY"
+      - name: Test dependency download under allowlist
+        shell: bash
+        run: |
+          set -eu
+          cd "$RUNNER_TEMP/allowlist-lab"
+          env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy -u NO_PROXY -u no_proxy srt --settings "$PWD/settings.json" python3 -m pip download --disable-pip-version-check --no-cache-dir --only-binary=:all: --no-deps --index-url https://pypi.org/simple --dest "$PWD/wheels" idna==3.10
+          test -f wheels/idna-3.10-py3-none-any.whl
+          echo 'PASS: actual PyPI wheel fetch' >> "$GITHUB_STEP_SUMMARY"
