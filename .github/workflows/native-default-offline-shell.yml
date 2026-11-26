@@ -5,13 +5,17 @@ on:
     paths: [.github/workflows/native-default-offline-shell.yml]
   workflow_dispatch:
 permissions: {}
+defaults:
+  run:
+    shell: >-
+      unshare --user --map-current-user --net --keep-caps --
+      setpriv --no-new-privs --bounding-set=-all
+      --inh-caps=-all --ambient-caps=-all --
+      bash --noprofile --norc -e -o pipefail {0}
 jobs:
   verify:
     runs-on: ubuntu-slim
     timeout-minutes: 5
-    defaults:
-      run:
-        shell: unshare --user --map-current-user --net --keep-caps -- setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all -- bash --noprofile --norc -e -o pipefail {0}
     steps:
       - name: Online baseline
         shell: bash
@@ -32,7 +36,7 @@ jobs:
           for key in ("CapInh","CapPrm","CapEff","CapBnd","CapAmb"):
               assert int(status[key],16) == 0, (key,status[key])
           assert int(status["NoNewPrivs"]) == 1
-          assert [p.name for p in pathlib.Path("/sys/class/net").iterdir()] == ["lo"] or all(line.split(":")[0].strip() == "lo" for line in pathlib.Path("/proc/net/dev").read_text().splitlines()[2:])
+          assert [line.split(":")[0].strip() for line in pathlib.Path("/proc/net/dev").read_text().splitlines()[2:]] == ["lo"]
           code = "import socket,errno; s=socket.socket(); s.settimeout(2); r=s.connect_ex(('1.1.1.1',443)); assert r in (errno.ENETUNREACH,errno.EPERM,errno.EACCES),r"
           subprocess.run([sys.executable,"-c",code],check=True)
           exec(code)
@@ -56,3 +60,42 @@ jobs:
           test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
           test -f subdir/local-output
           echo "PASS: default shell reapplied after online exception" >> "$GITHUB_STEP_SUMMARY"
+
+  second-job:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Online positive control
+        shell: bash
+        run: |
+          echo "ORIGINAL_NETNS=$(readlink /proc/self/ns/net)" >> "$GITHUB_ENV"
+          python3 -c 'import socket; socket.create_connection(("1.1.1.1",443),5).close()'
+      - name: Workflow default inherited independently
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          python3 - <<'PY'
+          import errno, socket
+          with socket.socket() as s:
+              s.settimeout(2)
+              assert s.connect_ex(("1.1.1.1",443)) in (errno.ENETUNREACH, errno.EPERM, errno.EACCES)
+          print("PASS: second job inherits workflow-wide default")
+          PY
+      - name: Bash failure propagates
+        id: failure
+        continue-on-error: true
+        run: |
+          false
+          touch "$RUNNER_TEMP/should-not-exist"
+      - name: Pipefail propagates
+        id: pipefail
+        continue-on-error: true
+        run: false | true
+      - name: Check outcomes
+        env:
+          FAILURE_OUTCOME: ${{ steps.failure.outcome }}
+          PIPEFAIL_OUTCOME: ${{ steps.pipefail.outcome }}
+        run: |
+          test "$FAILURE_OUTCOME" = failure
+          test "$PIPEFAIL_OUTCOME" = failure
+          test ! -e "$RUNNER_TEMP/should-not-exist"
+          echo "PASS: default shell preserves Bash errexit and pipefail" >> "$GITHUB_STEP_SUMMARY"

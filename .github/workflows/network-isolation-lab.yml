@@ -2,6 +2,7 @@ name: Ubuntu slim network isolation lab
 on:
   push:
     branches: [experiment/ubuntu-slim-network-isolation]
+    paths: [.github/workflows/network-isolation-lab.yml]
   workflow_dispatch:
 permissions: {}
 jobs:
