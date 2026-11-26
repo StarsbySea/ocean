@@ -259,12 +259,15 @@ jobs:
                   s.settimeout(2); s.connect(address)
           def pair():
               a,b=socket.socketpair(); a.close(); b.close()
+          def nested_userns():
+              p=subprocess.run(["unshare","--user","--map-current-user","--","true"],capture_output=True)
+              if p.returncode: raise OSError(1,"nested user namespace rejected")
           def aio():
               async def task(): return 1
               asyncio.run(task())
           status=dict(line.split(":",1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)
           file=Path(f"write-{os.getpid()}"); file.write_text("ok"); file.unlink()
-          print("COMPAT",{"uid":os.getuid(),"gid":os.getgid(),"CapEff":status["CapEff"].strip(),"CapBnd":status["CapBnd"].strip(),"NoNewPrivs":status["NoNewPrivs"].strip(),"netns":os.readlink("/proc/self/ns/net"),"tcp":attempt(lambda:conn(socket.AF_INET,("127.0.0.1",int(Path("port").read_text())))),"external":attempt(lambda:conn(socket.AF_INET,("1.1.1.1",443))),"unix":attempt(lambda:conn(socket.AF_UNIX,"test.sock")),"socketpair":attempt(pair),"asyncio":attempt(aio),"subprocess":attempt(lambda:subprocess.run([sys.executable,"-c","pass"],check=True)),"write":"ok"},flush=True)
+          print("COMPAT",{"uid":os.getuid(),"gid":os.getgid(),"CapEff":status["CapEff"].strip(),"CapBnd":status["CapBnd"].strip(),"NoNewPrivs":status["NoNewPrivs"].strip(),"netns":os.readlink("/proc/self/ns/net"),"tcp":attempt(lambda:conn(socket.AF_INET,("127.0.0.1",int(Path("port").read_text())))),"external":attempt(lambda:conn(socket.AF_INET,("1.1.1.1",443))),"unix":attempt(lambda:conn(socket.AF_UNIX,"test.sock")),"socketpair":attempt(pair),"asyncio":attempt(aio),"subprocess":attempt(lambda:subprocess.run([sys.executable,"-c","pass"],check=True)),"write":"ok","nested_userns":attempt(nested_userns)},flush=True)
           PY
           cat > benchmark.py <<'PY'
           import subprocess, statistics, time, shlex, os
@@ -274,7 +277,11 @@ jobs:
               "unshare-root": ["unshare","--user","--map-root-user","--net","--"],
               "unshare-current": ["unshare","--user","--map-current-user","--net","--"],
               "unshare-hardened": ["unshare","--user","--map-current-user","--net","--","setpriv","--no-new-privs","--bounding-set=-all","--inh-caps=-all","--ambient-caps=-all","--"],
+              "unshare-nnp": ["unshare","--user","--map-current-user","--net","--","setpriv","--no-new-privs","--"],
+              "unshare-keep-caps-drop": ["unshare","--user","--map-current-user","--net","--keep-caps","--","setpriv","--no-new-privs","--bounding-set=-all","--inh-caps=-all","--ambient-caps=-all","--"],
               "bubblewrap": ["bwrap","--unshare-net","--bind","/","/","--dev","/dev","--proc","/proc","--"],
+              "bubblewrap-minimal": ["bwrap","--unshare-net","--bind","/","/","--"],
+              "bubblewrap-deny-nested-userns": ["bwrap","--unshare-user","--disable-userns","--unshare-net","--bind","/","/","--dev","/dev","--proc","/proc","--"],
           }
           for name,cmd in methods.items():
               print("METHOD",name,shlex.join(cmd),flush=True)
