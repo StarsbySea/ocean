@@ -1,0 +1,58 @@
+name: Native default offline shell
+on:
+  push:
+    branches: [experiment/ubuntu-slim-network-isolation]
+    paths: [.github/workflows/native-default-offline-shell.yml]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: unshare --user --map-current-user --net --keep-caps -- setpriv --no-new-privs --bounding-set=-all --inh-caps=-all --ambient-caps=-all -- bash --noprofile --norc -e -o pipefail {0}
+    steps:
+      - name: Online baseline
+        shell: bash
+        run: |
+          echo "ORIGINAL_NETNS=$(readlink /proc/self/ns/net)" >> "$GITHUB_ENV"
+          echo "ORIGINAL_UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "ORIGINAL_GID=$(id -g)" >> "$GITHUB_ENV"
+          python3 -c 'import socket; socket.create_connection(("1.1.1.1",443),5).close()'
+          mkdir -p "$GITHUB_WORKSPACE/subdir"
+      - name: Default shell is offline and privilege reduced
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          test "$(id -u)" = "$ORIGINAL_UID"
+          test "$(id -g)" = "$ORIGINAL_GID"
+          python3 - <<'PY'
+          import asyncio, errno, pathlib, socket, subprocess, sys
+          status = dict(line.split(":",1) for line in pathlib.Path("/proc/self/status").read_text().splitlines() if ":" in line)
+          for key in ("CapInh","CapPrm","CapEff","CapBnd","CapAmb"):
+              assert int(status[key],16) == 0, (key,status[key])
+          assert int(status["NoNewPrivs"]) == 1
+          assert [p.name for p in pathlib.Path("/sys/class/net").iterdir()] == ["lo"] or all(line.split(":")[0].strip() == "lo" for line in pathlib.Path("/proc/net/dev").read_text().splitlines()[2:])
+          code = "import socket,errno; s=socket.socket(); s.settimeout(2); r=s.connect_ex(('1.1.1.1',443)); assert r in (errno.ENETUNREACH,errno.EPERM,errno.EACCES),r"
+          subprocess.run([sys.executable,"-c",code],check=True)
+          exec(code)
+          async def task(): return 42
+          assert asyncio.run(task()) == 42
+          print("PASS: network namespace, UID/GID, all capability sets, NNP, TCP, child and asyncio")
+          PY
+      - name: Another working directory stays offline
+        working-directory: subdir
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          test "$(basename "$PWD")" = subdir
+          touch local-output
+      - name: Explicit online override
+        shell: bash
+        run: |
+          test "$(readlink /proc/self/ns/net)" = "$ORIGINAL_NETNS"
+          python3 -c 'import socket; socket.create_connection(("1.1.1.1",443),5).close()'
+      - name: Offline restored automatically
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          test -f subdir/local-output
+          echo "PASS: default shell reapplied after online exception" >> "$GITHUB_STEP_SUMMARY"
