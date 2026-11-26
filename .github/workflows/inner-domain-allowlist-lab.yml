@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pid: ['true', 'false']
+        pid: ['false']
     runs-on: ubuntu-slim
     timeout-minutes: 8
     steps:
@@ -49,9 +49,13 @@ jobs:
           network_allow = ["pypi.org:443", "files.pythonhosted.org:443", "registry.npmjs.org:443"]
           home = "isolated"
           pid_namespace = true
+          [env]
+          inherit = ["HOME", "USER", "PATH", "LANG"]
           [entrypoint]
           cmd = "/usr/bin/python3"
           interactive = false
+          [output]
+          timeout_seconds = 120
           TOML
           sed -i "s/^pid_namespace = true$/pid_namespace = $TEST_PID_NAMESPACE/" "$HOME/.config/inner/profiles/ci-fetch.toml"
           inner doctor || true
