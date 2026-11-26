@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+[[ $# == 1 ]] || exit 64
+exec /bin/bash "${BASH_SOURCE[0]%/*}/offline.sh" /bin/bash --noprofile --norc -e -o pipefail "$1"

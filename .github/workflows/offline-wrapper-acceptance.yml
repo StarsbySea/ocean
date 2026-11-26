@@ -4,6 +4,7 @@ on:
     branches: [experiment/ubuntu-slim-network-isolation]
     paths:
       - .github/scripts/offline.sh
+      - .github/scripts/offline-shell
       - .github/workflows/offline-wrapper-acceptance.yml
       - .github/tests/offline_probe.py
   workflow_dispatch:
@@ -43,3 +44,48 @@ jobs:
       - name: Verify live network isolation and compatibility
         shell: bash
         run: python3 .github/tests/offline_probe.py
+
+  default-shell:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: offline-shell {0}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Online setup and positive control
+        shell: bash
+        run: |
+          bash -n .github/scripts/offline.sh .github/scripts/offline-shell
+          install -d "$RUNNER_TEMP/offline-bin"
+          install -m 755 .github/scripts/offline.sh .github/scripts/offline-shell "$RUNNER_TEMP/offline-bin/"
+          echo "$RUNNER_TEMP/offline-bin" >> "$GITHUB_PATH"
+          echo "ORIGINAL_NETNS=$(readlink /proc/self/ns/net)" >> "$GITHUB_ENV"
+          python3 -c 'import socket; socket.create_connection(("1.1.1.1",443),5).close()'
+      - name: Automatically offline
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          grep -E '^CapEff:|^CapBnd:|^NoNewPrivs:' /proc/self/status
+          python3 - <<'PY'
+          import socket, errno
+          with socket.socket() as s:
+              s.settimeout(2)
+              try: s.connect(("1.1.1.1",443))
+              except OSError as e: assert e.errno in (errno.ENETUNREACH, errno.EPERM, errno.EACCES), repr(e)
+              else: raise AssertionError("unexpected network access")
+          PY
+      - name: Automatically offline in another working directory
+        working-directory: .github
+        run: |
+          test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
+          test -d scripts
+          echo 'PASS: custom default shell and alternate working directory' >> "$GITHUB_STEP_SUMMARY"
+      - name: Explicit online override
+        shell: bash
+        run: |
+          test "$(readlink /proc/self/ns/net)" = "$ORIGINAL_NETNS"
+          python3 -c 'import socket; socket.create_connection(("1.1.1.1",443),5).close()'
+      - name: Default offline restored automatically
+        run: test "$(readlink /proc/self/ns/net)" != "$ORIGINAL_NETNS"
